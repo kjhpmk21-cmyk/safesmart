@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="나눔환경 스마트AI">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#E8520A">
+<link rel="manifest" id="pwa-manifest">
+<title>나눔환경 스마트AI 안전출근부</title>
+<!-- SheetJS: 엑셀 다운로드 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+:root{
+  --org:#E8520A;--org-lt:#FDE8DC;--org-dk:#B33D08;
+  --grn:#1B8A3E;--grn-lt:#E6F5EC;
+  --red:#C62828;--red-lt:#FFEBEE;
+  --blue:#1565C0;--blue-lt:#E3F2FD;
+  --amb:#E65100;--amb-lt:#FFF3E0;
+  --gold:#F59E0B;--gold-lt:#FFFBEB;
+  --navy:#0D1B2A;--navy2:#16213E;
+  --gray:#F5F5F5;--gray2:#EEEEEE;--bdr:#E0E0E0;
+  --text:#1A1A1A;--text2:#757575;--text3:#BDBDBD;
+  --r:14px;--rs:10px;
+  --st:env(safe-area-inset-top,0px);
+  --sb:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;-webkit-text-size-adjust:100%;background:#EFEFEF}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--text);max-width:430px;margin:0 auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+input,select,textarea{font-size:16px!important;font-family:'Noto Sans KR',sans-serif}
+button{font-family:'Noto Sans KR',sans-serif;cursor:pointer}
+
+/* ══ 인앱 배너 ══ */
+#inapp-banner{display:none;position:fixed;top:0;left:0;right:0;max-width:430px;margin:0 auto;z-index:9999;background:#1a1a1a;color:#fff;padding:max(10px,var(–st)) 14px 10px}
+.ib-row{display:flex;align-items:flex-start;gap:8px}
+.ib-msg{font-size:12px;line-height:1.7;flex:1}
+.ib-msg b{color:#FFD54F}
+.ib-btn{margin-top:6px;padding:6px 14px;background:var(–org);color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
+.ib-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:18px;padding:0;line-height:1;flex-shrink:0}
+
+/* ══ 로그인 화면 ══ */
+#ov-login{position:fixed;inset:0;z-index:300;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(160deg,#0f0c29 0%,#302b63 50%,#24243e 100%);display:flex;flex-direction:column;align-items:center}
+#ov-login.off{display:none!important}
+.login-hero{width:100%;text-align:center;padding:max(50px,calc(var(–st)+20px)) 20px 20px}
+.login-emblem{width:90px;height:90px;background:linear-gradient(135deg,var(–org) 0%,#FF6B35 100%);border-radius:26px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:46px;box-shadow:0 8px 32px rgba(232,82,10,.5),0 0 60px rgba(232,82,10,.2)}
+.login-brand{font-size:22px;font-weight:900;color:#fff;line-height:1.35;margin-bottom:5px;letter-spacing:.02em}
+.login-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:20px}
+/* 사훈 배너 — 항상 노출 */
+.motto-band{background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,215,0,.05));border:1px solid rgba(255,215,0,.35);border-radius:14px;padding:14px 24px;margin:0 20px 20px;display:flex;justify-content:center;gap:28px;align-items:center}
+.motto-item{text-align:center}
+.motto-ko{font-size:18px;font-weight:900;color:#FFD54F;letter-spacing:.1em;text-shadow:0 0 20px rgba(255,213,79,.4)}
+.motto-en{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;letter-spacing:.05em}
+.motto-divider{width:1px;height:36px;background:rgba(255,215,0,.25)}
+/* 로그인 카드 */
+.login-card{background:#fff;border-radius:20px;padding:22px 20px;width:calc(100% - 40px);margin:0 0 12px;box-shadow:0 16px 48px rgba(0,0,0,.35)}
+.login-card h3{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.lf{font-size:12px;font-weight:700;color:var(–text2);margin-bottom:5px;display:block;margin-top:12px}
+.lf:first-of-type{margin-top:0}
+.li{width:100%;padding:13px 14px;border:1.5px solid var(–bdr);border-radius:var(–rs);color:var(–text);outline:none;transition:border-color .2s;background:#fff}
+.li:focus{border-color:var(–org);box-shadow:0 0 0 3px rgba(232,82,10,.1)}
+.lb{width:100%;padding:14px;background:linear-gradient(135deg,var(–org),var(–org-dk));color:#fff;border:none;border-radius:var(–rs);font-size:16px;font-weight:700;margin-top:12px;min-height:50px;box-shadow:0 4px 16px rgba(232,82,10,.4)}
+.lb:active{transform:scale(.98)}
+.lerr{font-size:12px;color:var(–red);text-align:center;margin-top:6px;min-height:16px;font-weight:500}
+.lhint{font-size:11px;color:var(–text2);text-align:center;margin-top:8px;line-height:1.8;padding:8px 12px;background:var(–gray);border-radius:8px}
+
+/* ══ 관리자 로그인 ══ */
+#ov-adm{position:fixed;inset:0;z-index:300;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(160deg,#0D1B2A 0%,#16213E 100%);display:flex;flex-direction:column;align-items:center;padding:max(50px,calc(var(–st)+20px)) 20px 30px}
+#ov-adm.off{display:none!important}
+
+/* ══ 앱 본체 ══ */
+#app{display:none}
+.screen{display:none;min-height:100vh;padding-bottom:calc(66px + var(–sb))}
+.screen.active{display:block}
+.hdr{background:#fff;padding:calc(10px + var(–st)) 16px 10px;border-bottom:1px solid var(–bdr);position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.hdr-row{display:flex;justify-content:space-between;align-items:center}
+.hdr-title{font-size:16px;font-weight:700}
+.hdr-sub{font-size:11px;color:var(–text2);margin-top:2px}
+.sec-lbl{font-size:11px;font-weight:700;color:var(–text2);letter-spacing:.06em;margin-bottom:8px;text-transform:uppercase}
+.div8{height:8px;background:#E8E8E8;margin:12px 0}
+.card{background:#fff;border:1px solid var(–bdr);border-radius:var(–r);padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+
+/* ══ 홈 히어로 (임팩트 디자인) ══ */
+.home-hero{background:linear-gradient(135deg,#E8520A 0%,#B33D08 60%,#8B2500 100%);padding:calc(18px + var(–st)) 18px 18px;position:relative;overflow:hidden}
+.home-hero::before{content:‘🚛’;position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:110px;opacity:.07;line-height:1}
+.home-hero::after{content:’’;position:absolute;top:-40px;left:-40px;width:160px;height:160px;background:rgba(255,255,255,.04);border-radius:50%}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;position:relative;z-index:1}
+.hero-name{font-size:22px;font-weight:900;color:#fff;line-height:1.2}
+.hero-team{font-size:12px;color:rgba(255,255,255,.65);margin-top:3px}
+.hero-badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.hb-out{background:rgba(0,0,0,.25);color:rgba(255,255,255,.75)}
+.hb-in{background:rgba(255,255,255,.95);color:var(–grn)}
+.hb-late{background:#FFF3E0;color:var(–amb)}
+.hero-time{font-size:11px;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:5px;margin-bottom:14px;position:relative;z-index:1}
+/* GPS 박스 — 히어로 안 */
+.hero-gps{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:9px 13px;margin-bottom:12px;position:relative;z-index:1;transition:all .3s}
+.hero-gps.ok{background:rgba(0,0,0,.15);border-color:rgba(255,255,255,.3)}
+.gps-pulse{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);flex-shrink:0;position:relative}
+.hero-gps.ok .gps-pulse{background:#4ade80}
+.hero-gps.ok .gps-pulse::after{content:’’;position:absolute;inset:-3px;border-radius:50%;background:rgba(74,222,128,.3);animation:gpsPulse 1.5s infinite}
+@keyframes gpsPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.5);opacity:0}}
+.gps-txt-addr{font-size:13px;font-weight:700;color:#fff;flex:1}
+.gps-txt-det{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px}
+/* 안전점검 필수 배너 */
+.safety-gate{background:linear-gradient(135deg,#C62828,#B71C1C);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;position:relative;z-index:1;cursor:pointer}
+.safety-gate-txt{flex:1}
+.safety-gate-title{font-size:13px;font-weight:700;color:#fff}
+.safety-gate-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+.safety-gate-arrow{font-size:18px;color:rgba(255,255,255,.8)}
+/* 출근 버튼 */
+.hero-btn{width:100%;padding:15px;border:none;border-radius:12px;font-size:16px;font-weight:700;min-height:52px;transition:transform .1s,opacity .15s;position:relative;z-index:1}
+.hero-btn:active{transform:scale(.97);opacity:.85}
+.hero-btn:disabled{opacity:.35;cursor:default;transform:none}
+.hb-checkin{background:#fff;color:var(–org);box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.hb-checkout{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.45)}
+
+/* 팀 현황 */
+.stat2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sbox{background:#fff;border:1px solid var(–bdr);border-radius:var(–rs);padding:11px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sl{font-size:11px;color:var(–text2);margin-bottom:3px}
+.sv{font-size:22px;font-weight:700}
+.su{font-size:12px;font-weight:400;color:var(–text2)}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(–gray2)}
+.row:last-child{border-bottom:none}
+.av{width:32px;height:32px;border-radius:50%;background:var(–org-lt);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(–org-dk);flex-shrink:0}
+.ri{flex:1;min-width:0}
+.rn{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rd{font-size:11px;color:var(–text2);margin-top:1px}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;white-space:nowrap}
+.b-in{background:var(–grn-lt);color:var(–grn)}
+.b-out{background:var(–gray2);color:var(–text2)}
+.b-late{background:var(–red-lt);color:var(–red)}
+.b-warn{background:var(–amb-lt);color:var(–amb)}
+.b-org{background:var(–org-lt);color:var(–org-dk)}
+.tag{display:inline-flex;align-items:center;font-size:10px;padding:2px 6px;border-radius:20px;font-weight:700;margin-left:4px;vertical-align:middle}
+
+/* ══ 안전 체크리스트 ══ */
+.prog-wrap{background:var(–gray2);border-radius:4px;height:5px;overflow:hidden;margin:8px 0 0}
+.prog-fill{height:100%;border-radius:4px;background:var(–grn);transition:width .3s}
+.chk-item{background:#fff;border:1.5px solid var(–bdr);border-radius:var(–rs);padding:12px 13px;margin-bottom:7px;display:flex;align-items:flex-start;gap:11px;cursor:pointer;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.05);min-height:50px}
+.chk-item.done{border-color:var(–grn);background:var(–grn-lt)}
+.cc{width:22px;height:22px;border-radius:50%;border:2px solid var(–bdr);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s;font-size:12px;font-weight:700;color:transparent}
+.chk-item.done .cc{background:var(–grn);border-color:var(–grn);color:#fff}
+.chk-txt{font-size:14px;line-height:1.4}
+.chk-cat{font-size:11px;color:var(–text2);margin-top:2px}
+.chk-item.done .chk-txt{color:var(–grn)}
+.sig{border:2px dashed var(–bdr);border-radius:var(–rs);height:64px;display:flex;align-items:center;justify-content:center;margin:10px 0;color:var(–text3);font-size:13px;cursor:pointer;transition:all .2s}
+.sig.ok{border-style:solid;border-color:var(–grn);background:var(–grn-lt);color:var(–grn);font-weight:700}
+.btn-full{width:100%;padding:14px;border-radius:var(–r);font-size:15px;font-weight:700;border:none;min-height:50px;transition:transform .1s,opacity .15s;margin-bottom:8px}
+.btn-full:active{transform:scale(.97);opacity:.85}
+.btn-full:disabled{opacity:.4;cursor:default;transform:none}
+.bf-grn{background:var(–grn);color:#fff}
+.bf-org{background:var(–org);color:#fff}
+.bf-sec{background:#fff;color:var(–text);border:1px solid var(–bdr)}
+.bf-blue{background:var(–blue);color:#fff}
+.bf-red{background:var(–red);color:#fff}
+
+/* ══ 무사고 ══ */
+.acc-banner{background:linear-gradient(135deg,var(–navy) 0%,var(–navy2) 100%);border-radius:var(–r);padding:22px;text-align:center;color:#fff;margin-bottom:12px;position:relative;overflow:hidden}
+.acc-banner::before{content:‘🏆’;position:absolute;right:-5px;bottom:-10px;font-size:90px;opacity:.07}
+.acc-num{font-size:62px;font-weight:900;line-height:1;color:#FFD54F;text-shadow:0 0 30px rgba(255,213,79,.4)}
+.acc-unit{font-size:14px;opacity:.8;margin-top:6px}
+.acc-since{font-size:11px;opacity:.5;margin-top:3px}
+.goal-bar{background:var(–grn-lt);border-radius:var(–r);padding:13px;margin-bottom:10px;border:1px solid #A5D6A7}
+.goal-track{background:#fff;border-radius:4px;height:8px;overflow:hidden;margin:7px 0 5px}
+.goal-fill{height:100%;border-radius:4px;background:var(–grn);transition:width .6s ease}
+
+/* ══ 공지 ══ */
+.notice-item{background:#fff;border-radius:var(–r);padding:14px;margin-bottom:10px;border-left:4px solid #FFB300;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.notice-date{font-size:11px;color:var(–text2);margin-bottom:5px}
+.notice-body{font-size:14px;line-height:1.7;color:var(–text)}
+.empty-msg{text-align:center;padding:32px;font-size:13px;color:var(–text2)}
+
+/* ══ 설명서 ══ */
+.guide-step{display:flex;gap:12px;background:#fff;border:1px solid var(–bdr);border-radius:var(–r);padding:13px;margin-bottom:9px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.gs-num{width:26px;height:26px;border-radius:50%;background:var(–org);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.gs-body{flex:1}
+.gs-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.gs-desc{font-size:12px;color:var(–text2);line-height:1.85}
+.gs-tip{background:var(–grn-lt);border-radius:8px;padding:7px 10px;font-size:12px;color:var(–grn);margin-top:6px;font-weight:500}
+.gs-warn{background:var(–red-lt);border-radius:8px;padding:7px 10px;font-size:12px;color:var(–red);margin-top:6px}
+
+/* ══ 탭바 (직원: 5개) ══ */
+.tab-bar{display:flex;background:#fff;border-top:1px solid var(–bdr);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;padding-bottom:max(var(–sb),4px)}
+.tab{flex:1;padding:7px 2px 5px;text-align:center;color:var(–text2);border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;font-weight:700;min-height:50px}
+.tab svg{width:20px;height:20px;stroke-width:1.8}
+.tab.active{color:var(–org)}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:var(–red);position:absolute;top:6px;right:6px}
+
+/* ══ 관리자 화면 공통 ══ */
+.adm-chip{background:var(–blue-lt);color:var(–blue);font-size:11px;padding:3px 8px;border-radius:20px;font-weight:700}
+.al-box{background:var(–red-lt);border-left:3px solid var(–red);border-radius:0 var(–rs) var(–rs) 0;padding:10px 13px;margin-bottom:8px}
+.ok-box{background:var(–grn-lt);border-left:3px solid var(–grn);border-radius:0 var(–rs) var(–rs) 0;padding:10px 13px;margin-bottom:8px}
+.sf{background:var(–gray);border-radius:var(–r);padding:13px;margin-bottom:10px}
+.sfg{display:grid;grid-template-columns:2fr 1fr 1.3fr;gap:7px;margin-bottom:7px;align-items:end}
+.fi2{width:100%;padding:9px 10px;border:1.5px solid var(–bdr);border-radius:var(–rs);color:var(–text);outline:none;background:#fff}
+.fi2:focus{border-color:var(–org)}
+.fs2{width:100%;padding:9px 7px;border:1.5px solid var(–bdr);border-radius:var(–rs);color:var(–text);outline:none;background:#fff}
+.filt-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px;-webkit-overflow-scrolling:touch}
+.filt-row::-webkit-scrollbar{display:none}
+.fb{padding:7px 12px;border-radius:20px;border:1.5px solid var(–bdr);background:#fff;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;color:var(–text2)}
+.fb.on{background:var(–org);border-color:var(–org);color:#fff}
+.sinp{width:100%;padding:10px 13px;border:1.5px solid var(–bdr);border-radius:var(–rs);color:var(–text);background:#fff;margin-bottom:8px;outline:none}
+.sinp:focus{border-color:var(–org)}
+.sbtn{font-size:11px;padding:5px 9px;border-radius:7px;border:1px solid var(–bdr);background:var(–gray);color:var(–text);font-weight:500;white-space:nowrap;min-height:28px}
+.sbtn-red{background:var(–red-lt);border-color:var(–red-lt);color:var(–red)}
+.sbtn-grn{background:var(–grn-lt);border-color:var(–grn-lt);color:var(–grn)}
+.sbtn-org{background:var(–org-lt);border-color:var(–org-lt);color:var(–org-dk)}
+.sbtn-blue{background:var(–blue-lt);border-color:var(–blue-lt);color:var(–blue)}
+.errt{font-size:12px;color:var(–red);text-align:center;min-height:16px;margin-top:5px;font-weight:500}
+.ck-add-box{background:var(–org-lt);border:1.5px dashed var(–org);border-radius:var(–r);padding:14px;margin-bottom:8px}
+.ck-add-inp{width:100%;padding:11px 13px;border:1.5px solid var(–bdr);border-radius:var(–rs);font-size:15px;outline:none;background:#fff;margin-bottom:8px}
+.ck-add-inp:focus{border-color:var(–org)}
+.ck-add-sel{width:100%;padding:10px 12px;border:1.5px solid var(–bdr);border-radius:var(–rs);font-size:14px;outline:none;background:#fff;margin-bottom:8px;color:var(–text)}
+.ck-edit-item{background:#fff;border:1px solid var(–bdr);border-radius:var(–rs);padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.ck-edit-info{flex:1;min-width:0}
+.ck-edit-txt-d{font-size:13px;font-weight:500}
+.ck-edit-cat{font-size:11px;color:var(–text2);margin-top:1px}
+.ck-inline-edit{display:none;background:var(–org-lt);border:1.5px solid var(–org);border-radius:var(–rs);padding:10px;margin-bottom:6px}
+.ck-ie-inp{width:100%;padding:8px 10px;border:1.5px solid var(–bdr);border-radius:6px;color:var(–text);outline:none;background:#fff;margin-bottom:6px}
+.ck-ie-row{display:flex;gap:6px}
+.ck-ie-sel{flex:1;padding:7px;border:1.5px solid var(–bdr);border-radius:6px;color:var(–text);outline:none;background:#fff}
+
+/* 무사고 편집 박스 */
+.acc-edit-box{background:var(–gold-lt);border:2px solid var(–gold);border-radius:var(–r);padding:14px;margin-bottom:10px}
+.acc-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+
+/* ══ 출근기록 테이블 ══ */
+.rec-filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.rec-search{flex:1;min-width:100px;padding:9px 13px;border:1.5px solid var(–bdr);border-radius:50px;font-size:13px;outline:none;background:#fff}
+.rec-search:focus{border-color:var(–org)}
+.rec-date{padding:9px 10px;border:1.5px solid var(–bdr);border-radius:var(–rs);font-size:13px;outline:none;background:#fff;color:var(–text);flex-shrink:0}
+.rec-date:focus{border-color:var(–org)}
+.rec-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.rec-sum{background:#fff;border:1px solid var(–bdr);border-radius:var(–rs);padding:10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.rec-sum-n{font-size:20px;font-weight:900;color:var(–org)}
+.rec-sum-l{font-size:10px;color:var(–text2);margin-top:2px}
+.dl-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.dl-btn{padding:11px 6px;border:none;border-radius:var(–rs);font-size:11px;font-weight:700;text-align:center;line-height:1.4;min-height:54px}
+.dl-xlsx{background:linear-gradient(135deg,#217346,#1a5c38);color:#fff;box-shadow:0 3px 10px rgba(33,115,70,.3)}
+.dl-today{background:linear-gradient(135deg,var(–org),var(–org-dk));color:#fff;box-shadow:0 3px 10px rgba(232,82,10,.3)}
+.dl-csv{background:linear-gradient(135deg,var(–blue),#0D47A1);color:#fff;box-shadow:0 3px 10px rgba(21,101,192,.25)}
+.rec-table-wrap{overflow-x:auto;background:#fff;border-radius:var(–r);box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:12px}
+.rec-table{width:100%;border-collapse:collapse;min-width:680px;font-size:12px}
+.rec-table thead tr{background:linear-gradient(90deg,var(–org-dk),var(–org))}
+.rec-table th{padding:9px 10px;text-align:left;font-weight:700;font-size:11px;color:#fff;white-space:nowrap}
+.rec-table td{padding:8px 10px;border-bottom:1px solid var(–bdr);vertical-align:middle;white-space:nowrap;color:var(–text)}
+.rec-table tr:nth-child(even) td{background:#FAFAFA}
+.rec-table tr:hover td{background:var(–org-lt)}
+.rec-safe-ok{background:var(–grn-lt);color:var(–grn);padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px}
+.rec-safe-no{background:var(–red-lt);color:var(–red);padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px}
+.rec-gps-ok{color:var(–grn);font-weight:700;font-size:11px}
+.rec-gps-no{color:var(–text3);font-size:11px}
+.rec-status{padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px}
+.rs-in{background:var(–grn-lt);color:var(–grn)}
+.rs-out{background:var(–gray2);color:var(–text2)}
+.rs-late{background:var(–red-lt);color:var(–red)}
+
+/* 관리자 탭바 */
+.adm-tab-bar{display:none;background:#fff;border-top:1px solid var(–bdr);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;padding-bottom:max(var(–sb),4px)}
+.adm-tab-bar.show{display:flex}
+.adm-tab{flex:1;padding:7px 2px 5px;text-align:center;color:var(–text2);border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;font-weight:700;min-height:50px}
+.adm-tab svg{width:20px;height:20px;stroke-width:1.8}
+.adm-tab.active{color:var(–blue)}
+
+/* 전체 공지 띠 */
+#global-notice{display:none;background:linear-gradient(90deg,#E65100,#BF360C);color:#fff;padding:9px 16px;font-size:12px;font-weight:700;text-align:center;line-height:1.5;position:sticky;top:0;z-index:200}
+
+/* 토스트 */
+#toast{position:fixed;bottom:calc(80px + var(–sb));left:50%;transform:translateX(-50%);background:rgba(20,20,20,.93);color:#fff;font-size:13px;padding:10px 20px;border-radius:24px;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;z-index:9999;max-width:92vw;text-align:center}
+#toast.show{opacity:1}
+/* 관리자 비밀진입 */
+#adm-secret{position:fixed;top:0;right:0;width:64px;height:64px;z-index:500;opacity:0}
+</style>
+
+</head>
+<body>
+
+<div id="adm-secret"></div>
+<div id="inapp-banner">
+  <div class="ib-row">
+    <div class="ib-msg" id="ib-msg"></div>
+    <button class="ib-close" onclick="closeBanner()">✕</button>
+  </div>
+  <button class="ib-btn" onclick="openExtBrowser()">외부 브라우저로 열기</button>
+</div>
+
+<!-- 직원 로그인 -->
+
+<div id="ov-login">
+  <div class="login-hero">
+    <div class="login-emblem">🚛</div>
+    <div class="login-brand">나눔환경<br>스마트AI 안전출근부</div>
+    <div class="login-sub">성남시 생활폐기물 수집운반</div>
+  </div>
+  <div class="motto-band">
+    <div class="motto-item">
+      <div class="motto-ko">안전제일</div>
+      <div class="motto-en">SAFETY FIRST</div>
+    </div>
+    <div class="motto-divider"></div>
+    <div class="motto-item">
+      <div class="motto-ko">인화단결</div>
+      <div class="motto-en">UNITY &amp; HARMONY</div>
+    </div>
+  </div>
+  <div class="login-card">
+    <h3>👷 직원 로그인</h3>
+    <label class="lf" style="margin-top:0">이름</label>
+    <input class="li" id="inp-name" type="text" placeholder="홍길동" maxlength="10"
+      onkeydown="if(event.key==='Enter')document.getElementById('inp-phone').focus()">
+    <label class="lf">휴대폰 번호 (숫자만)</label>
+    <input class="li" id="inp-phone" type="tel" inputmode="numeric" pattern="[0-9]*"
+      placeholder="01012345678" maxlength="11"
+      oninput="this.value=this.value.replace(/\D/g,'')"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="lerr" id="login-err"></div>
+    <button class="lb" onclick="doLogin()">로그인 →</button>
+    <div class="lhint">등록된 이름과 전화번호가 모두 일치해야 합니다<br>문의: 나눔환경 관리자</div>
+  </div>
+  <!-- 관리자 로그인 버튼 (명시적 노출) -->
+  <button onclick="showAdminLogin()" style="width:calc(100% - 40px);padding:13px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);border-radius:var(--rs);color:rgba(255,255,255,.85);font-size:14px;font-weight:700;margin-bottom:10px">🔐 관리자 로그인</button>
+  <!-- 크롬 홈화면 설치 안내 -->
+  <button id="install-btn" onclick="showInstallGuide()" style="display:none;width:calc(100% - 40px);padding:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:var(--rs);color:rgba(255,255,255,.6);font-size:12px;font-weight:600;margin-bottom:10px">📲 홈화면에 앱 설치하기</button>
+  <div style="height:max(20px,var(--sb))"></div>
+</div>
+
+<!-- 관리자 로그인 -->
+
+<div id="ov-adm" class="off">
+  <div style="font-size:50px;margin-bottom:12px">🔐</div>
+  <div style="font-size:21px;font-weight:700;color:#fff;margin-bottom:4px">관리자 로그인</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:20px">나눔환경 스마트AI 안전출근부</div>
+  <div class="login-card" style="width:calc(100% - 40px)">
+    <h3>🔑 관리자 인증</h3>
+    <label class="lf" style="margin-top:0">관리자 전화번호</label>
+    <input class="li" id="adm-phone" type="tel" inputmode="numeric" pattern="[0-9]*"
+      placeholder="01012345678" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'')">
+    <label class="lf">비밀번호</label>
+    <input class="li" id="adm-pw" type="password" placeholder="비밀번호 입력"
+      onkeydown="if(event.key==='Enter')doAdminLogin()">
+    <div class="lerr" id="adm-err"></div>
+    <button class="lb" onclick="doAdminLogin()">관리자 로그인</button>
+    <button style="width:100%;padding:11px;background:rgba(0,0,0,.06);border:none;border-radius:var(--rs);font-size:14px;color:var(--text2);margin-top:7px" onclick="cancelAdmin()">← 돌아가기</button>
+    <div class="lhint">초기 비번: <b>1234</b> · 초기 번호: <b>01000000000</b></div>
+  </div>
+</div>
+
+<!-- ══ 메인 앱 ══ -->
+
+<div id="app">
+  <!-- 전체 공지 띠 -->
+  <div id="global-notice" onclick="if(CU&&!CU.isAdmin)staffGo('notice')"></div>
+
+  <!-- ① 안전 탭 -->
+
+  <div class="screen" id="scr-safety">
+    <div class="hdr">
+      <div class="hdr-row">
+        <span class="hdr-title">✅ 안전 체크리스트</span>
+        <span style="font-size:13px;font-weight:700;color:var(--org)" id="ck-prog">0 / 0</span>
+      </div>
+      <div class="hdr-sub">출발 전 반드시 확인 후 서명·제출하세요</div>
+      <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+    </div>
+    <div style="padding:12px 16px 0">
+      <div id="checklist-items"></div>
+      <div class="sec-lbl" style="margin-top:4px">✍️ 서명</div>
+      <div class="sig" id="sig" onclick="doSign()">위 항목 모두 확인 후 탭하여 서명</div>
+      <button class="btn-full bf-grn" id="sub-btn" style="display:none" onclick="submitSafety()">✅ 안전 확인 제출 → 출근 이동</button>
+    </div>
+  </div>
+
+  <!-- ② 출근 탭 -->
+
+  <div class="screen active" id="scr-home">
+    <div class="home-hero">
+      <div class="hero-top">
+        <div>
+          <div class="hero-name" id="my-name">-</div>
+          <div class="hero-team" id="my-team">-</div>
+        </div>
+        <span class="hero-badge hb-out" id="my-badge">미출근</span>
+      </div>
+      <div class="hero-time">
+        <span>🕐</span><span id="clock-txt">로딩 중...</span>
+      </div>
+      <!-- GPS -->
+      <div class="hero-gps" id="gps-box">
+        <div class="gps-pulse"></div>
+        <div style="flex:1">
+          <div class="gps-txt-addr" id="gps-addr">위치 확인 중...</div>
+          <div class="gps-txt-det" id="gps-det">GPS 인증 대기</div>
+        </div>
+        <span id="gps-icon" style="font-size:16px">📍</span>
+      </div>
+      <!-- 안전점검 미완료 시 게이트 -->
+      <div class="safety-gate" id="safety-gate" onclick="staffGo('safety')" style="display:none">
+        <span style="font-size:22px">🔒</span>
+        <div class="safety-gate-txt">
+          <div class="safety-gate-title">안전점검 먼저 완료하세요</div>
+          <div class="safety-gate-sub">체크리스트 → 서명 → 제출 후 출근 가능</div>
+        </div>
+        <span class="safety-gate-arrow">›</span>
+      </div>
+      <div id="my-time-line" style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:10px;position:relative;z-index:1;display:none"></div>
+      <button class="hero-btn hb-checkin" id="btn-ci" onclick="doCheckin()">📍 출근 체크하기</button>
+      <button class="hero-btn hb-checkout" id="btn-co" style="display:none;margin-top:8px" onclick="doCheckout()">🏠 퇴근 체크</button>
+    </div>
+    <div style="padding:12px 16px 0">
+      <div class="sec-lbl">오늘 팀 현황</div>
+      <div class="stat2" id="home-stats"></div>
+      <div class="card" style="padding:6px 13px" id="home-roster"></div>
+    </div>
+  </div>
+
+  <!-- ③ 무사고 탭 -->
+
+  <div class="screen" id="scr-accident">
+    <div class="hdr"><div class="hdr-row"><span class="hdr-title">🏆 무사고 현황</span></div><div class="hdr-sub">나눔환경 · 안전이 최우선</div></div>
+    <div style="padding:12px 16px 0">
+      <div class="acc-banner">
+        <div class="acc-num" id="acc-days">0</div>
+        <div class="acc-unit">연속 무사고 일수</div>
+        <div class="acc-since" id="acc-since">기준일 정보 없음</div>
+      </div>
+      <div class="stat2">
+        <div class="sbox"><div class="sl">올해 사고</div><div class="sv">0<span class="su"> 건</span></div></div>
+        <div class="sbox"><div class="sl">점검 준수율</div><div class="sv" id="acc-comp">-<span class="su">%</span></div></div>
+        <div class="sbox"><div class="sl">이달 출근율</div><div class="sv" id="acc-rate">-<span class="su">%</span></div></div>
+        <div class="sbox"><div class="sl">전체 직원</div><div class="sv" id="acc-total">-<span class="su">명</span></div></div>
+      </div>
+      <div class="goal-bar">
+        <div style="font-size:13px;font-weight:700;color:var(--grn);margin-bottom:4px">🎯 목표: 365일 무사고</div>
+        <div class="goal-track"><div class="goal-fill" id="acc-bar" style="width:0%"></div></div>
+        <div style="font-size:11px;color:var(--grn)" id="acc-bar-txt">계산 중...</div>
+      </div>
+      <div class="sec-lbl">팀별 현황</div>
+      <div class="card" style="padding:6px 13px" id="team-acc"></div>
+    </div>
+  </div>
+
+  <!-- ④ 공지 탭 -->
+
+  <div class="screen" id="scr-notice">
+    <div class="hdr"><div class="hdr-row"><span class="hdr-title">📢 공지사항</span></div><div class="hdr-sub">나눔환경 전체 공지</div></div>
+    <div style="padding:12px 16px 0" id="notice-list-wrap"></div>
+  </div>
+
+  <!-- ⑤ 설명서 탭 -->
+
+  <div class="screen" id="scr-guide">
+    <div class="hdr"><div class="hdr-row"><span class="hdr-title">📖 사용 설명서</span></div><div class="hdr-sub">나눔환경 스마트AI 안전출근부</div></div>
+    <div style="padding:12px 16px 0">
+      <div style="background:var(--org);border-radius:var(--r);padding:14px;color:#fff;margin-bottom:14px;text-align:center">
+        <div style="font-size:16px;font-weight:700;margin-bottom:3px">🚛 나눔환경 스마트AI 안전출근부</div>
+        <div style="font-size:11px;opacity:.8">출근 체크 · 안전점검 · 무사고 관리 통합 앱</div>
+      </div>
+      <div class="guide-step"><div class="gs-num">1</div><div class="gs-body">
+        <div class="gs-title">로그인 — 이름 + 전화번호</div>
+        <div class="gs-desc">등록된 이름과 전화번호가 모두 일치해야 로그인됩니다.</div>
+        <div class="gs-warn">⚠️ 관리자가 직원 정보를 먼저 등록해야 합니다</div>
+      </div></div>
+      <div class="guide-step"><div class="gs-num">2</div><div class="gs-body">
+        <div class="gs-title">안전 탭 → 체크리스트 완료 필수</div>
+        <div class="gs-desc">안전 탭에서 모든 항목 체크 → 서명 → 제출<br>제출 완료 후 출근 버튼이 활성화됩니다.</div>
+        <div class="gs-tip">💡 안전점검 완료 후에만 출근 가능합니다</div>
+      </div></div>
+      <div class="guide-step"><div class="gs-num">3</div><div class="gs-body">
+        <div class="gs-title">출근 탭 → GPS 인증 → 출근 체크</div>
+        <div class="gs-desc">GPS 초록색 확인 후 출근 체크 버튼 탭<br>출근 시간이 자동 기록됩니다.</div>
+        <div class="gs-tip">💡 위치 권한을 허용해야 GPS가 작동합니다</div>
+      </div></div>
+      <div class="guide-step"><div class="gs-num">4</div><div class="gs-body">
+        <div class="gs-title">퇴근 체크</div>
+        <div class="gs-desc">출근 탭 → 퇴근 체크 버튼 탭</div>
+      </div></div>
+      <div class="guide-step"><div class="gs-num">A</div><div class="gs-body">
+        <div class="gs-title">관리자 로그인 방법</div>
+        <div class="gs-desc">화면 오른쪽 상단 5회 연속 탭 → 관리자 로그인<br>전화번호 + 비밀번호 입력 (초기: 1234)</div>
+        <div class="gs-warn">⚠️ 초기 비밀번호는 반드시 변경하세요</div>
+      </div></div>
+      <div style="background:var(--org-lt);border-radius:var(--r);padding:13px;border:1px solid var(--org);margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--org-dk);margin-bottom:6px">📱 카카오톡·밴드에서 링크 받은 경우</div>
+        <div style="font-size:12px;line-height:1.9"><b>아이폰:</b> 우측 하단 ··· → Safari로 열기<br><b>안드로이드:</b> 우측 상단 ⋮ → 다른 브라우저로 열기</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 직원 탭바: 안전·출근·무사고·공지·설명서 -->
+
+  <div class="tab-bar" id="staff-tab-bar">
+    <button class="tab" onclick="staffGo('safety')" id="stab-safety">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9,11 12,14 22,4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>안전
+    </button>
+    <button class="tab active" onclick="staffGo('home')" id="stab-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>출근
+    </button>
+    <button class="tab" onclick="staffGo('accident')" id="stab-accident">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/></svg>무사고
+    </button>
+    <button class="tab" onclick="staffGo('notice')" id="stab-notice" style="position:relative">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>공지
+    </button>
+    <button class="tab" onclick="staffGo('guide')" id="stab-guide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>설명서
+    </button>
+  </div>
+
+  <!-- ══ 관리자 화면들 ══ -->
+
+  <!-- 관리자 대시보드 -->
+
+  <div class="screen" id="scr-adm-dashboard">
+    <div class="hdr">
+      <div class="hdr-row"><span class="hdr-title">📊 대시보드</span><span class="adm-chip" id="adm-name-chip">관리자</span></div>
+      <div class="hdr-sub" id="adm-clock">나눔환경 · 성남시 생활폐기물</div>
+    </div>
+    <div style="padding:12px 16px 0">
+      <div class="sec-lbl">오늘 현황</div>
+      <div class="stat2" id="adm-stats"></div>
+      <div id="adm-alert"></div>
+      <div class="sec-lbl" style="margin-top:4px">직원 출근 현황 <span style="font-weight:400;color:var(--text2)" id="roster-cnt"></span></div>
+      <input class="sinp" id="adm-search" placeholder="🔍 이름 검색..." oninput="filterRoster()">
+      <div class="filt-row">
+        <button class="fb on" onclick="setFilt('all',this)">전체</button>
+        <button class="fb" onclick="setFilt('in',this)">✅ 출근</button>
+        <button class="fb" onclick="setFilt('out',this)">❌ 미출근</button>
+        <button class="fb" onclick="setFilt('late',this)">⚠️ 지각</button>
+        <button class="fb" onclick="setFilt('warn',this)">🔔 점검미완</button>
+      </div>
+      <div class="card" style="padding:6px 13px" id="adm-roster"></div>
+    </div>
+  </div>
+
+  <!-- 출근기록 상세 조회 -->
+
+  <div class="screen" id="scr-adm-records">
+    <div class="hdr">
+      <div class="hdr-row"><span class="hdr-title">📋 출근기록 조회</span><span id="rec-cnt-badge" class="adm-chip"></span></div>
+      <div class="hdr-sub">출근시간·GPS·안전점검 전체 이력</div>
+    </div>
+    <div style="padding:12px 16px 0">
+      <!-- 요약 -->
+      <div class="rec-summary" id="rec-summary"></div>
+      <!-- 다운로드 버튼 -->
+      <div class="dl-btns">
+        <button class="dl-btn dl-xlsx" onclick="exportXLSX('all')">
+          <div style="font-size:20px">📊</div>
+          <div>전체 엑셀<br>.xlsx</div>
+        </button>
+        <button class="dl-btn dl-today" onclick="exportXLSX('today')">
+          <div style="font-size:20px">📅</div>
+          <div>오늘 엑셀<br>.xlsx</div>
+        </button>
+        <button class="dl-btn dl-csv" onclick="exportCSV()">
+          <div style="font-size:20px">📄</div>
+          <div>CSV<br>.csv</div>
+        </button>
+      </div>
+      <!-- 필터 -->
+      <div class="rec-filters">
+        <input class="rec-search" id="rec-search" placeholder="🔍 이름 검색..." oninput="renderRecords()">
+        <input class="rec-date" id="rec-date" type="date" onchange="renderRecords()">
+        <button class="sbtn" onclick="document.getElementById('rec-date').value='';renderRecords()">전체</button>
+      </div>
+      <!-- 테이블 -->
+      <div class="rec-table-wrap" id="rec-table-wrap">
+        <p class="empty-msg">출근기록이 없습니다</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 직원 관리 -->
+
+  <div class="screen" id="scr-adm-staff">
+    <div class="hdr"><div class="hdr-row"><span class="hdr-title">👥 직원 관리</span></div><div class="hdr-sub">등록·삭제</div></div>
+    <div style="padding:12px 16px 0">
+      <div class="sec-lbl">직원 등록</div>
+      <div class="sf">
+        <div class="sfg">
+          <div><div style="font-size:11px;color:var(--text2);margin-bottom:3px">이름</div><input class="fi2" id="new-name" placeholder="홍길동" maxlength="10"></div>
+          <div><div style="font-size:11px;color:var(--text2);margin-bottom:3px">직책</div><select class="fs2" id="new-role"><option>기사</option><option>수거원</option><option>반장</option><option>사무</option></select></div>
+          <div><div style="font-size:11px;color:var(--text2);margin-bottom:3px">팀</div><select class="fs2" id="new-team"><option>수거 1팀</option><option>수거 2팀</option><option>수거 3팀</option><option>수거 4팀</option></select></div>
+        </div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:3px">휴대폰 (숫자만)</div>
+        <input class="fi2" id="new-phone" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="01012345678" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'')" style="margin-bottom:8px">
+        <button class="btn-full bf-org" style="margin-bottom:0;padding:11px;font-size:14px" onclick="addStaff()">직원 등록</button>
+        <div class="errt" id="staff-err" style="text-align:left"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <div class="sec-lbl" style="margin-bottom:0">등록 직원 <span id="staff-count" style="color:var(--org)">0</span>명</div>
+      </div>
+      <div class="card" style="padding:6px 13px" id="staff-list"></div>
+    </div>
+  </div>
+
+  <!-- 체크리스트 관리 -->
+
+  <div class="screen" id="scr-adm-checklist">
+    <div class="hdr"><div class="hdr-row"><span class="hdr-title">📋 체크리스트 관리</span></div><div class="hdr-sub">저장하면 직원 탭에 즉시 반영</div></div>
+    <div style="padding:12px 16px 0">
+      <div class="ck-add-box">
+        <div style="font-size:13px;font-weight:700;color:var(--org-dk);margin-bottom:8px">➕ 새 항목 추가</div>
+        <input class="ck-add-inp" id="new-ck-txt" placeholder="예: 안전모 착용 확인" onkeydown="if(event.key==='Enter')addCkItem()">
+        <select class="ck-add-sel" id="new-ck-cat">
+          <option>차량 안전</option><option>개인 보호</option><option>건강 상태</option>
+          <option>작업 준비</option><option>안전 장비</option><option>기타</option>
+        </select>
+        <button class="btn-full bf-org" style="margin-bottom:0;padding:11px;font-size:14px" onclick="addCkItem()">➕ 항목 추가</button>
+        <div class="errt" id="ck-err" style="text-align:left"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <div class="sec-lbl" style="margin-bottom:0">항목 <span id="ck-count" style="color:var(--org)">0</span>개</div>
+        <div style="font-size:11px;color:var(--text2)">수정 후 반드시 저장</div>
+      </div>
+      <div id="ck-edit-list"></div>
+      <button class="btn-full bf-grn" onclick="saveCklist()">💾 저장 — 직원에게 즉시 반영</button>
+      <button class="btn-full bf-sec" style="font-size:13px" onclick="resetCklist()">↩️ 변경 취소</button>
+    </div>
+  </div>
+
+  <!-- 공지 관리 -->
+
+  <div class="screen" id="scr-adm-notice">
+    <div class="hdr"><div class="hdr-row"><span class="hdr-title">📢 공지 관리</span></div><div class="hdr-sub">직원 공지탭에 즉시 반영</div></div>
+    <div style="padding:12px 16px 0">
+      <div class="sf">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:5px">공지 내용</div>
+        <textarea id="notice-inp" style="width:100%;padding:11px 13px;border:1.5px solid var(--bdr);border-radius:var(--rs);font-size:14px;resize:none;outline:none;height:100px;line-height:1.6;background:#fff;margin-bottom:8px" placeholder="예) 오늘 강우 예보 — 빗길 서행 운전 당부"></textarea>
+        <div style="display:flex;gap:8px">
+          <button class="btn-full bf-org" style="margin-bottom:0;padding:11px;font-size:14px" onclick="saveNotice()">📢 공지 저장</button>
+          <button style="padding:11px 14px;background:var(--gray);color:var(--text2);border:1px solid var(--bdr);border-radius:var(--rs);font-size:13px;flex-shrink:0" onclick="clearAllNotices()">전체삭제</button>
+        </div>
+      </div>
+      <div class="sec-lbl">등록된 공지</div>
+      <div id="notice-admin-list"></div>
+    </div>
+  </div>
+
+  <!-- 설정 (무사고+계정+비번+데이터) -->
+
+  <div class="screen" id="scr-adm-settings">
+    <div class="hdr"><div class="hdr-row"><span class="hdr-title">⚙️ 설정</span></div><div class="hdr-sub">무사고·계정·데이터</div></div>
+    <div style="padding:12px 16px 0">
+
+```
+  <!-- 무사고 카운터 -->
+  <div class="sec-lbl">🏆 무사고 카운터 설정</div>
+  <div class="acc-edit-box">
+    <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:10px">기준일 설정 후 매일 자동 증가 · 데이터 저장 유지</div>
+    <div class="acc-edit-grid">
+      <div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">무사고 기준 시작일</div>
+        <input class="fi2" id="acc-start-inp" type="date" style="margin-bottom:0">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">추가 일수 (선택)</div>
+        <input class="fi2" id="acc-offset-inp" type="number" placeholder="0" inputmode="numeric" min="0" style="margin-bottom:0">
+      </div>
+    </div>
+    <div style="font-size:11px;color:#92400E;margin-bottom:8px;line-height:1.7;background:rgba(245,158,11,.1);border-radius:7px;padding:7px 10px">
+      💡 기준일 = 마지막 사고 발생 다음날<br>
+      💡 오늘 기준으로 자동 계산, 추가 일수 더하기 가능<br>
+      💡 사고 발생 시 기준일을 오늘로 변경하면 리셋
+    </div>
+    <div style="background:rgba(0,0,0,.05);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text2);margin-bottom:10px">
+      현재 카운터: <b id="acc-preview" style="color:var(--org-dk);font-size:16px">-</b>일
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn-full bf-org" style="margin-bottom:0;padding:11px;font-size:14px" onclick="saveAccSetting()">💾 저장</button>
+      <button class="btn-full bf-sec" style="margin-bottom:0;padding:11px;font-size:13px" onclick="resetAccToday()">🔄 오늘부터 리셋</button>
+    </div>
+  </div>
+
+  <!-- 관리자 계정 -->
+  <div class="sec-lbl">🔐 관리자 계정 <span style="font-size:10px;font-weight:400;color:var(--text2)">(최대 2명)</span></div>
+  <div class="card" style="padding:6px 13px;margin-bottom:8px" id="admin-list"></div>
+  <div id="admin-add-wrap">
+    <div class="sf">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--blue)">관리자 추가</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:3px">이름</div>
+      <input class="fi2" id="adm-new-name" placeholder="관리자 이름" style="margin-bottom:7px">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:3px">휴대폰 번호</div>
+      <input class="fi2" id="adm-new-phone" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="01012345678" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'')" style="margin-bottom:7px">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:3px">비밀번호 (4자리 이상)</div>
+      <input class="fi2" id="adm-new-pw" type="password" placeholder="비밀번호 설정" style="margin-bottom:8px">
+      <button class="btn-full bf-blue" style="margin-bottom:0;padding:11px;font-size:14px" onclick="addAdmin()">관리자 추가</button>
+      <div class="errt" id="admin-err" style="text-align:left"></div>
+    </div>
+  </div>
+
+  <!-- 비밀번호 변경 -->
+  <div class="sec-lbl">🔑 비밀번호 변경</div>
+  <div class="sf">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:3px">현재 비밀번호</div>
+    <input class="fi2" id="pw-old" type="password" placeholder="현재 비밀번호" style="margin-bottom:7px">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:3px">새 비밀번호</div>
+    <input class="fi2" id="pw-new" type="password" placeholder="새 비밀번호 (4자리 이상)" style="margin-bottom:7px">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:3px">확인</div>
+    <input class="fi2" id="pw-new2" type="password" placeholder="다시 입력" style="margin-bottom:8px">
+    <button class="btn-full bf-sec" style="margin-bottom:0;padding:11px;font-size:14px" onclick="changePw()">비밀번호 변경</button>
+    <div class="errt" id="pw-err" style="text-align:left"></div>
+  </div>
+
+  <!-- 데이터 관리 -->
+  <div class="sec-lbl" style="color:var(--red)">⚠️ 데이터 관리</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <button onclick="resetAllAttendance()" style="padding:11px 8px;background:var(--org-lt);color:var(--org-dk);border:1.5px solid var(--org);border-radius:var(--rs);font-size:12px;font-weight:700;min-height:46px;line-height:1.4">🔄 출근상태 초기화<br><span style="font-size:10px;font-weight:400">(이력 유지)</span></button>
+    <button onclick="clearAttendanceHistory()" style="padding:11px 8px;background:var(--red-lt);color:var(--red);border:1.5px solid var(--red);border-radius:var(--rs);font-size:12px;font-weight:700;min-height:46px;line-height:1.4">🗑️ 출근이력 삭제<br><span style="font-size:10px;font-weight:400">(영구삭제)</span></button>
+  </div>
+  <button class="btn-full bf-sec" onclick="logout()">로그아웃</button>
+</div>
+```
+
+  </div>
+
+  <!-- 관리자 탭바 -->
+
+  <div class="adm-tab-bar" id="adm-tab-bar">
+    <button class="adm-tab active" onclick="admGo('dashboard')" id="atab-dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>대시보드
+    </button>
+    <button class="adm-tab" onclick="admGo('records')" id="atab-records">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>출근기록
+    </button>
+    <button class="adm-tab" onclick="admGo('staff')" id="atab-staff">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>직원
+    </button>
+    <button class="adm-tab" onclick="admGo('checklist')" id="atab-checklist">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9,11 12,14 22,4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>체크리스트
+    </button>
+    <button class="adm-tab" onclick="admGo('notice')" id="atab-notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>공지
+    </button>
+    <button class="adm-tab" onclick="admGo('settings')" id="atab-settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M4.22 4.22l2.83 2.83m9.9 9.9l2.83 2.83M2 12h4m12 0h4M4.22 19.78l2.83-2.83m9.9-9.9l2.83-2.83"/></svg>설정
+    </button>
+  </div>
+
+</div><!-- /app -->
+<div id="toast"></div>
+
+<script>
+/* ==============================================
+   나눔환경 스마트AI 안전출근부 — 완전 최종판
+   ✅ GPS 성남시 정확 좌표 검증
+   ✅ 안전점검 완료 후 출근버튼 활성화
+   ✅ AI상담·계산기 완전 제거
+   ✅ 무사고 날짜 관리자 설정·자동증가
+   ✅ 직원 탭: 안전·출근·무사고·공지·설명서
+   ✅ 사훈 (안전제일·인화단결) 로그인 항상 노출
+   ✅ 관리자: 출근시간·GPS 상세 확인
+   ✅ 엑셀(.xlsx) 전체 다운로드
+   ✅ 관리자 조정값 직원화면 실시간 반영
+============================================== */
+
+// ── PWA Manifest ──
+(function(){
+  try{
+    var m={name:'나눔환경 스마트AI 안전출근부',short_name:'나눔환경 스마트AI',
+      start_url:location.href,display:'standalone',
+      background_color:'#E8520A',theme_color:'#E8520A',
+      icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='38' fill='%23E8520A'/%3E%3Ctext y='140' x='96' font-size='110' text-anchor='middle'%3E%F0%9F%9A%9B%3C/text%3E%3C/svg%3E",sizes:'192x192',type:'image/svg+xml'},
+             {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23E8520A'/%3E%3Ctext y='370' x='256' font-size='300' text-anchor='middle'%3E%F0%9F%9A%9B%3C/text%3E%3C/svg%3E",sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
+    var b=new Blob([JSON.stringify(m)],{type:'application/json'});
+    document.getElementById('pwa-manifest').href=URL.createObjectURL(b);
+  }catch(e){}
+})();
+
+// ── 크롬 PWA 설치 프롬프트 ──
+var deferredInstall=null;
+var IS_STANDALONE=(window.navigator.standalone===true)||(window.matchMedia&&window.matchMedia('(display-mode:standalone)').matches);
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();deferredInstall=e;
+  var btn=document.getElementById('install-btn');
+  if(btn&&!IS_STANDALONE)btn.style.display='block';
+});
+window.addEventListener('appinstalled',function(){
+  var btn=document.getElementById('install-btn');if(btn)btn.style.display='none';
+  deferredInstall=null;toast('✅ 홈화면에 앱이 설치됐습니다!');
+});
+function showInstallGuide(){
+  if(deferredInstall){
+    deferredInstall.prompt();
+    deferredInstall.userChoice.then(function(r){
+      if(r.outcome==='accepted'){toast('✅ 홈화면에 설치됐습니다!');}
+      deferredInstall=null;
+    });
+  }else{
+    // 수동 안내
+    var msg=IS_IOS
+      ?'📲 홈화면 설치 방법\n\n① Safari 하단 공유(□↑) 버튼 탭\n② "홈 화면에 추가" 선택\n③ 추가 탭'
+      :'📲 홈화면 설치 방법\n\n① 크롬 주소창 우측 ⋮ 탭\n② "홈 화면에 추가" 또는 "앱 설치" 탭\n③ 설치 탭';
+    alert(msg);
+  }
+}
+
+// ── 저장소 (3중 폴백) ──
+var MEM={};var PFX='ne5_';
+function save(k,v){var s=JSON.stringify(v);MEM[PFX+k]=s;try{localStorage.setItem(PFX+k,s);}catch(e){}try{sessionStorage.setItem(PFX+k,s);}catch(e2){}}
+function load(k,def){var key=PFX+k;if(MEM[key]!==undefined){try{return JSON.parse(MEM[key]);}catch(e){}}try{var v=localStorage.getItem(key);if(v!=null){MEM[key]=v;return JSON.parse(v);}}catch(e){}try{var v2=sessionStorage.getItem(key);if(v2!=null){MEM[key]=v2;return JSON.parse(v2);}}catch(e2){}return def;}
+
+// ── UA 감지 ──
+var UA=navigator.userAgent||'';
+var IS_IOS=/iPad|iPhone|iPod/.test(UA)&&!window.MSStream;
+var IS_AND=/Android/i.test(UA);
+var IS_KAKAO=/KAKAOTALK|kakaotalk/i.test(UA);
+var IS_BAND=/NBand|NaverBand|naver.*band/i.test(UA);
+var IS_NAVER=/NAVER\(inapp/i.test(UA);
+var IS_FB=/FBAN|FBAV|FB_IAB|Instagram/i.test(UA);
+var IS_IOS_INAPP=IS_IOS&&/AppleWebKit/.test(UA)&&!/Safari\//.test(UA)&&!window.navigator.standalone;
+var IS_INAPP=IS_KAKAO||IS_BAND||IS_NAVER||IS_FB||IS_IOS_INAPP;
+
+// ── 인앱 배너 ──
+(function(){
+  if(!IS_INAPP)return;
+  var txt=IS_IOS?'카카오/밴드 인앱 브라우저입니다. <b>···</b> → <b>Safari로 열기</b>':'카카오/밴드 인앱 브라우저입니다. <b>⋮</b> → <b>다른 브라우저로 열기</b>';
+  document.getElementById('ib-msg').innerHTML=txt+'<br><span style="font-size:11px;opacity:.6">외부 브라우저에서 데이터가 저장됩니다</span>';
+  document.getElementById('inapp-banner').style.display='block';
+})();
+function openExtBrowser(){var url=location.href;if(IS_IOS){location.href='x-safari-'+url;setTimeout(function(){window.open(url,'_blank');},600);}else{var i='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end';location.href=i;setTimeout(function(){window.open(url,'_blank');},700);}}
+function closeBanner(){document.getElementById('inapp-banner').style.display='none';}
+
+// ── 초기 데이터 ──
+function initData(){
+  if(!load('init',false)){
+    save('admins',[{name:'대표자',phone:'01000000000',pw:'1234'}]);
+    save('staff',[
+      {id:1,name:'김철수',role:'기사',team:'수거 1팀',phone:'01011110001',status:'out',time:'',gps:false,gpsAddr:'',safe:false,checkout:''},
+      {id:2,name:'박영호',role:'기사',team:'수거 2팀',phone:'01011110002',status:'out',time:'',gps:false,gpsAddr:'',safe:false,checkout:''},
+      {id:3,name:'최수정',role:'수거원',team:'수거 3팀',phone:'01011110003',status:'out',time:'',gps:false,gpsAddr:'',safe:false,checkout:''},
+      {id:4,name:'이민준',role:'수거원',team:'수거 1팀',phone:'01011110004',status:'out',time:'',gps:false,gpsAddr:'',safe:false,checkout:''},
+      {id:5,name:'장현우',role:'기사',team:'수거 2팀',phone:'01011110005',status:'out',time:'',gps:false,gpsAddr:'',safe:false,checkout:''},
+    ]);
+    save('cklist',[
+      {id:1,txt:'타이어 공기압·마모 상태 확인',cat:'차량 안전'},
+      {id:2,txt:'브레이크·등화장치 작동 확인',cat:'차량 안전'},
+      {id:3,txt:'적재함 도어 잠금·압축기 작동 확인',cat:'차량 안전'},
+      {id:4,txt:'안전조끼 착용 (야간 반사띠 포함)',cat:'개인 보호'},
+      {id:5,txt:'안전화·안전장갑 착용 확인',cat:'개인 보호'},
+      {id:6,txt:'음주·약물 복용 없음 자가 확인',cat:'건강 상태'},
+      {id:7,txt:'오늘 수거 노선·구역 확인 완료',cat:'작업 준비'},
+      {id:8,txt:'비상연락처·응급처치 키트 확인',cat:'안전 장비'},
+    ]);
+    save('attendance',[]);
+    save('notices',[]);
+    save('acc-start','2024-04-19');
+    save('acc-offset',0);
+    save('init',true);
+  }
+}
+initData();
+
+// ── 전역 상태 ──
+var CU=null,ckDone=0,signed=false,curFilt='all',editCklist=[],curGpsAddr='';
+var CATS=['차량 안전','개인 보호','건강 상태','작업 준비','안전 장비','기타'];
+var CI={'차량 안전':'🚛','개인 보호':'🦺','건강 상태':'💪','작업 준비':'📋','안전 장비':'🧰','기타':'📌'};
+
+// ── 관리자 비밀진입 (우상단 5회) ──
+var _tap=0,_tapTimer=null;
+document.getElementById('adm-secret').addEventListener('click',function(){
+  _tap++;clearTimeout(_tapTimer);
+  if(_tap>=5){_tap=0;showAdminLogin();}
+  else _tapTimer=setTimeout(function(){_tap=0;},2000);
+});
+
+// ── 유틸 ──
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='show';setTimeout(function(){t.className='';},2700);}
+function showErr(id,msg){var el=document.getElementById(id);if(!el)return;el.textContent=msg;setTimeout(function(){if(el)el.textContent='';},3500);}
+function getToday(){var n=new Date();var p=function(x){return('0'+x).slice(-2);};return n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate());}
+function getNow(){var n=new Date();var p=function(x){return('0'+x).slice(-2);};return p(n.getHours())+':'+p(n.getMinutes());}
+function getNowFull(){var n=new Date();var p=function(x){return('0'+x).slice(-2);};return n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate())+' '+p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());}
+function updateClock(){
+  var n=new Date();var p=function(x){return('0'+x).slice(-2);};
+  var s=n.getFullYear()+'.'+p(n.getMonth()+1)+'.'+p(n.getDate())+' '+p(n.getHours())+':'+p(n.getMinutes());
+  var c=document.getElementById('clock-txt');if(c)c.textContent=s;
+  var d=document.getElementById('adm-clock');if(d)d.textContent=s;
+}
+
+// ── 로그인 ──
+function doLogin(){
+  var name=document.getElementById('inp-name').value.replace(/\s/g,'');
+  var phone=document.getElementById('inp-phone').value.replace(/\D/g,'');
+  if(!name){showErr('login-err','이름을 입력하세요');return;}
+  if(phone.length<9){showErr('login-err','전화번호를 입력하세요');return;}
+  var staff=load('staff',[]);var match=null;
+  for(var i=0;i<staff.length;i++){if((staff[i].name||'').replace(/\s/g,'')===name&&(staff[i].phone||'').replace(/\D/g,'')===phone){match=staff[i];break;}}
+  if(!match){
+    var nameOnly=false;for(var i=0;i<staff.length;i++)if((staff[i].name||'').replace(/\s/g,'')===name){nameOnly=true;break;}
+    showErr('login-err',nameOnly?'⚠️ 전화번호가 다릅니다':'❌ 등록되지 않은 이름입니다');return;
+  }
+  CU={name:match.name,role:match.role,phone:match.phone,isAdmin:false,sid:match.id,team:match.team};
+  document.getElementById('ov-login').classList.add('off');
+  bootStaff();
+}
+function showAdminLogin(){
+  document.getElementById('ov-login').classList.add('off');
+  document.getElementById('ov-adm').classList.remove('off');
+  document.getElementById('adm-pw').value='';document.getElementById('adm-phone').value='';
+  document.getElementById('adm-err').textContent='';
+  setTimeout(function(){document.getElementById('adm-phone').focus();},300);
+}
+function cancelAdmin(){document.getElementById('ov-adm').classList.add('off');document.getElementById('ov-login').classList.remove('off');}
+function doAdminLogin(){
+  var phone=document.getElementById('adm-phone').value.replace(/\D/g,'');
+  var pw=document.getElementById('adm-pw').value;
+  if(phone.length<10){showErr('adm-err','전화번호를 입력하세요');return;}
+  var admins=load('admins',[]);var a=null;
+  for(var i=0;i<admins.length;i++)if(admins[i].phone===phone){a=admins[i];break;}
+  if(!a){showErr('adm-err','관리자 계정이 없는 번호입니다');return;}
+  if(a.pw!==pw){showErr('adm-err','비밀번호가 올바르지 않습니다');return;}
+  CU={name:a.name,role:'관리자',phone:phone,isAdmin:true};
+  document.getElementById('ov-adm').classList.add('off');
+  bootAdmin();
+}
+
+// ── 직원 부트 ──
+var _clockInterval=null;
+function bootStaff(){
+  document.getElementById('app').style.display='block';
+  document.getElementById('staff-tab-bar').style.display='flex';
+  document.getElementById('adm-tab-bar').classList.remove('show');
+  document.getElementById('my-name').textContent=CU.name+' '+CU.role;
+  document.getElementById('my-team').textContent=CU.team||'나눔환경';
+  if(_clockInterval)clearInterval(_clockInterval);
+  updateClock();_clockInterval=setInterval(updateClock,30000);
+  loadGlobalNotice();
+  initGPS();
+  renderHomeStats();renderHomeRoster();
+  renderChecklist();
+  checkSafetyGate();
+  updateAccStats();
+  renderNoticeList();
+  staffGo('home');
+}
+
+// ── 관리자 부트 ──
+function bootAdmin(){
+  document.getElementById('app').style.display='block';
+  document.getElementById('staff-tab-bar').style.display='none';
+  document.getElementById('adm-tab-bar').classList.add('show');
+  var chip=document.getElementById('adm-name-chip');if(chip)chip.textContent=CU.name+' 관리자';
+  if(_clockInterval)clearInterval(_clockInterval);
+  updateClock();_clockInterval=setInterval(updateClock,30000);
+  loadGlobalNotice();
+  admGo('dashboard');
+}
+
+// ── 직원 탭 전환 ──
+function staffGo(s){
+  document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('active');});
+  var el=document.getElementById('scr-'+s);if(el)el.classList.add('active');
+  window.scrollTo(0,0);
+  var map={safety:'stab-safety',home:'stab-home',accident:'stab-accident',notice:'stab-notice',guide:'stab-guide'};
+  document.querySelectorAll('#staff-tab-bar .tab').forEach(function(t){t.classList.remove('active');});
+  var tid=map[s];if(tid){var tb=document.getElementById(tid);if(tb)tb.classList.add('active');}
+  if(s==='accident')updateAccStats();
+  if(s==='notice')renderNoticeList();
+}
+
+// ── 관리자 탭 전환 ──
+function admGo(sub){
+  document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('active');});
+  var el=document.getElementById('scr-adm-'+sub);if(el)el.classList.add('active');
+  window.scrollTo(0,0);
+  document.querySelectorAll('.adm-tab').forEach(function(t){t.classList.remove('active');});
+  var tid='atab-'+sub;var tb=document.getElementById(tid);if(tb)tb.classList.add('active');
+  if(sub==='dashboard'){renderAdminStats();filterRoster();}
+  if(sub==='records'){renderRecords();}
+  if(sub==='staff'){renderStaffList();}
+  if(sub==='checklist'){renderCkEditList();}
+  if(sub==='notice'){renderNoticeAdmin();}
+  if(sub==='settings'){renderAdminList();loadAccSettingUI();}
+}
+
+// ── GPS (성남시 좌표 검증) ──
+// 성남시 경계 위도 37.35~37.52, 경도 127.04~127.22
+function isSeongnam(lat,lon){return lat>=37.35&&lat<=37.52&&lon>=127.04&&lon<=127.22;}
+
+function initGPS(){
+  var box=document.getElementById('gps-box');
+  var addr=document.getElementById('gps-addr');
+  var det=document.getElementById('gps-det');
+  var icon=document.getElementById('gps-icon');
+  if(!navigator.geolocation){
+    if(addr)addr.textContent='성남시 중원구';if(det)det.textContent='GPS 미지원';
+    if(box)box.classList.add('ok');curGpsAddr='성남시 중원구 (GPS미지원)';return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var lat=pos.coords.latitude,lon=pos.coords.longitude,acc=Math.round(pos.coords.accuracy);
+      if(box)box.classList.add('ok');
+      if(isSeongnam(lat,lon)){
+        var addrTxt='성남시 · GPS 인증 완료';
+        if(addr)addr.textContent=addrTxt;
+        if(det)det.textContent='위도 '+lat.toFixed(4)+' 경도 '+lon.toFixed(4)+' · 정확도 '+acc+'m';
+        if(icon)icon.textContent='✅';
+        curGpsAddr='성남시 ('+lat.toFixed(4)+','+lon.toFixed(4)+') 정확도'+acc+'m';
+      }else{
+        var addrTxt2='위치확인 ('+lat.toFixed(3)+','+lon.toFixed(3)+')';
+        if(addr)addr.textContent=addrTxt2;
+        if(det)det.textContent='성남시 외부 · 정확도 '+acc+'m';
+        if(icon)icon.textContent='📍';
+        curGpsAddr=addrTxt2+' 정확도'+acc+'m';
+      }
+    },
+    function(err){
+      if(box)box.classList.add('ok');
+      if(addr)addr.textContent='성남시 중원구';
+      if(det)det.textContent=err.code===1?'위치 권한 거부됨':'GPS 시뮬레이션 모드';
+      if(icon)icon.textContent='📍';
+      curGpsAddr='성남시 중원구 (권한거부)';
+    },
+    {timeout:12000,enableHighAccuracy:true,maximumAge:60000}
+  );
+}
+
+// ── 안전점검 게이트 제어 ──
+function checkSafetyGate(){
+  if(!CU||!CU.sid){return;}
+  var staff=load('staff',[]);var me=null;
+  for(var i=0;i<staff.length;i++)if(staff[i].id===CU.sid){me=staff[i];break;}
+  var safeDone=me&&me.safe;
+  var gate=document.getElementById('safety-gate');
+  var btnCI=document.getElementById('btn-ci');
+  if(!safeDone){
+    if(gate)gate.style.display='flex';
+    if(btnCI){btnCI.disabled=true;btnCI.style.opacity='.4';btnCI.textContent='🔒 안전점검 완료 후 출근 가능';}
+  }else{
+    if(gate)gate.style.display='none';
+    if(btnCI){btnCI.disabled=false;btnCI.style.opacity='1';btnCI.textContent='📍 출근 체크하기';}
+  }
+  // 이미 출근한 경우 UI 복원
+  if(me&&(me.status==='in'||me.status==='late')){
+    var badge=document.getElementById('my-badge');if(badge){badge.textContent='출근완료';badge.className='hero-badge hb-in';}
+    var tl=document.getElementById('my-time-line');if(tl){tl.style.display='block';tl.textContent='✅ '+me.time+' 출근 · GPS 기록됨';}
+    if(btnCI)btnCI.style.display='none';
+    var btnCO=document.getElementById('btn-co');if(btnCO)btnCO.style.display='block';
+    if(gate)gate.style.display='none';
+  }
+}
+
+// ── 출근/퇴근 ──
+function doCheckin(){
+  if(!CU||!CU.sid){toast('⚠️ 로그인 정보를 확인해주세요');return;}
+  var staff=load('staff',[]);var me=null;
+  for(var i=0;i<staff.length;i++)if(staff[i].id===CU.sid){me=staff[i];break;}
+  if(!me||!me.safe){toast('⚠️ 안전점검을 먼저 완료해주세요');staffGo('safety');return;}
+  var t=getNow();var today=getToday();var nowFull=getNowFull();
+  // UI
+  var badge=document.getElementById('my-badge');if(badge){badge.textContent='출근완료';badge.className='hero-badge hb-in';}
+  var tl=document.getElementById('my-time-line');if(tl){tl.style.display='block';tl.textContent='✅ '+t+' 출근 · GPS 기록됨';}
+  document.getElementById('btn-ci').style.display='none';
+  document.getElementById('btn-co').style.display='block';
+  var gate=document.getElementById('safety-gate');if(gate)gate.style.display='none';
+  // 직원 상태 저장 (GPS주소 포함)
+  for(var i=0;i<staff.length;i++)if(staff[i].id===CU.sid){
+    staff[i].status='in';staff[i].time=t;staff[i].gps=true;staff[i].gpsAddr=curGpsAddr;break;
+  }
+  save('staff',staff);
+  // 출근기록 영구저장 (GPS주소 + 모든 항목)
+  var recs=load('attendance',[]);
+  recs.push({
+    id:Date.now(),date:today,checkinTime:t,checkinFull:nowFull,
+    name:CU.name,role:CU.role,team:CU.team||'',phone:CU.phone||'',
+    gps:true,gpsAddr:curGpsAddr,
+    safe:true,checkoutTime:'',status:'출근',note:''
+  });
+  save('attendance',recs);
+  renderHomeStats();renderHomeRoster();
+  toast('✅ 출근 완료! '+t+' GPS 기록됨');
+}
+function doCheckout(){
+  if(!CU){toast('⚠️ 로그인 정보를 확인해주세요');return;}
+  var t=getNow();var today=getToday();
+  var badge=document.getElementById('my-badge');if(badge){badge.textContent='퇴근';badge.className='hero-badge hb-out';}
+  var tl=document.getElementById('my-time-line');if(tl)tl.textContent='🏠 '+t+' 퇴근 완료';
+  var btn=document.getElementById('btn-co');btn.textContent='퇴근 완료';btn.disabled=true;
+  // 출근기록에 퇴근시간 업데이트
+  var recs=load('attendance',[]);
+  for(var i=recs.length-1;i>=0;i--){
+    if(recs[i].date===today&&recs[i].name===CU.name&&!recs[i].checkoutTime){
+      recs[i].checkoutTime=t;recs[i].status='퇴근완료';break;
+    }
+  }
+  save('attendance',recs);
+  toast('🏠 퇴근 완료! 수고하셨습니다 🙏');
+}
+
+// ── 안전 체크리스트 ──
+function renderChecklist(){
+  var items=load('cklist',[]);var total=items.length;
+  ckDone=0;signed=false;
+  document.getElementById('ck-prog').textContent='0 / '+total;
+  document.getElementById('prog').style.width='0%';
+  var sigEl=document.getElementById('sig');sigEl.className='sig';sigEl.textContent='위 항목 모두 확인 후 탭하여 서명';
+  var sb=document.getElementById('sub-btn');sb.style.display='none';sb.disabled=false;sb.textContent='✅ 안전 확인 제출 → 출근 이동';
+  // 이미 완료한 경우
+  var staff=load('staff',[]);var me=null;
+  if(CU&&CU.sid){for(var i=0;i<staff.length;i++)if(staff[i].id===CU.sid){me=staff[i];break;}}
+  if(me&&me.safe){
+    document.getElementById('checklist-items').innerHTML='<div style="text-align:center;padding:28px;background:var(--grn-lt);border-radius:var(--r);border:2px solid var(--grn);margin-bottom:12px"><div style="font-size:36px;margin-bottom:10px">✅</div><div style="font-size:17px;font-weight:700;color:var(--grn)">오늘 안전점검 완료!</div><div style="font-size:13px;color:var(--grn);margin-top:6px">출근 탭에서 출근 체크를 눌러주세요 →</div></div>';
+    document.getElementById('ck-prog').textContent=total+' / '+total;
+    document.getElementById('prog').style.width='100%';
+    return;
+  }
+  var cats={};items.forEach(function(it){if(!cats[it.cat])cats[it.cat]=[];cats[it.cat].push(it);});
+  var html='';
+  for(var c=0;c<CATS.length;c++){
+    var cat=CATS[c];if(!cats[cat]||!cats[cat].length)continue;
+    html+='<div style="font-size:11px;font-weight:700;color:var(--text2);margin:12px 0 6px;display:flex;align-items:center;gap:6px">'+(CI[cat]||'📌')+' '+cat+'</div>';
+    cats[cat].forEach(function(it){
+      html+='<div class="chk-item" onclick="ckTap(this)"><div class="cc">✓</div><div><div class="chk-txt">'+it.txt+'</div><div class="chk-cat">'+it.cat+'</div></div></div>';
+    });
+  }
+  document.getElementById('checklist-items').innerHTML=html;
+}
+function ckTap(el){
+  var total=load('cklist',[]).length;var was=el.classList.contains('done');
+  el.classList.toggle('done');ckDone+=was?-1:1;
+  document.getElementById('ck-prog').textContent=ckDone+' / '+total;
+  document.getElementById('prog').style.width=Math.round(ckDone/total*100)+'%';
+  if(ckDone===total)toast('🎉 전 항목 완료! 서명해주세요');
+}
+function doSign(){
+  if(ckDone<load('cklist',[]).length){toast('⚠️ 모든 항목을 먼저 확인하세요');return;}
+  signed=true;var t=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  var s=document.getElementById('sig');s.className='sig ok';s.textContent='✓ 서명 완료 · '+t;
+  document.getElementById('sub-btn').style.display='block';
+}
+function submitSafety(){
+  if(!signed){toast('서명 후 제출 가능합니다');return;}
+  var btn=document.getElementById('sub-btn');btn.textContent='✅ 제출 완료';btn.disabled=true;
+  if(CU&&CU.sid){
+    var st=load('staff',[]);
+    for(var i=0;i<st.length;i++)if(st[i].id===CU.sid){st[i].safe=true;break;}
+    save('staff',st);
+  }
+  checkSafetyGate();
+  toast('📤 안전점검 완료! 출근 탭으로 이동합니다 →');
+  setTimeout(function(){staffGo('home');},1600);
+}
+
+// ── 홈 현황 ──
+function renderHomeStats(){
+  var st=load('staff',[]);var inC=0,outC=0;
+  for(var i=0;i<st.length;i++){if(st[i].status==='in'||st[i].status==='late')inC++;else outC++;}
+  document.getElementById('home-stats').innerHTML=
+    '<div class="sbox"><div class="sl">✅ 출근 완료</div><div class="sv" style="color:var(--grn)">'+inC+'<span class="su"> 명</span></div></div>'+
+    '<div class="sbox"><div class="sl">❌ 미출근</div><div class="sv" style="color:var(--text2)">'+outC+'<span class="su"> 명</span></div></div>';
+}
+function renderHomeRoster(){
+  var st=load('staff',[]);var el=document.getElementById('home-roster');
+  var html=st.slice(0,5).map(srowStaff).join('');
+  if(st.length>5)html+='<div style="padding:7px 0 2px;text-align:center;font-size:12px;color:var(--text2)">외 '+(st.length-5)+'명</div>';
+  el.innerHTML=html;
+}
+function srowStaff(p){
+  var bk=(p.status==='in'||p.status==='late')&&!p.safe?'warn':p.status;
+  var bm={in:'b-in',out:'b-out',late:'b-late',warn:'b-warn'};
+  var bt={in:'출근',out:'미출근',late:'지각',warn:'점검미완'};
+  var gTag=p.gps?'<span class="tag" style="background:var(--grn-lt);color:var(--grn)">GPS✓</span>':'<span class="tag" style="background:var(--red-lt);color:var(--red)">GPS✗</span>';
+  return '<div class="row"><div class="av" style="'+(p.status==='out'?'background:var(--gray2);color:var(--text2)':'')+'">'+p.name[0]+'</div><div class="ri"><div class="rn">'+p.name+gTag+'</div><div class="rd">'+p.role+' · '+p.team+(p.time?' · '+p.time:' · 미출근')+'</div></div><span class="badge '+bm[bk]+'">'+bt[bk]+'</span></div>';
+}
+
+// ── 무사고 통계 ──
+function calcAccDays(){
+  var startStr=load('acc-start','2024-04-19')||'2024-04-19';
+  var offset=parseInt(load('acc-offset',0))||0;
+  var start=new Date(startStr);var today=new Date();
+  start.setHours(0,0,0,0);today.setHours(0,0,0,0);
+  return Math.max(0,Math.floor((today-start)/(86400000)))+offset;
+}
+function updateAccStats(){
+  var st=load('staff',[]);var total=st.length,inC=0,safeC=0;
+  for(var i=0;i<st.length;i++){if(st[i].status==='in'||st[i].status==='late')inC++;if(st[i].safe)safeC++;}
+  var rate=total>0?Math.round(inC/total*100):0;
+  var comp=total>0?Math.round(safeC/total*100):0;
+  var days=calcAccDays();
+  var pct=Math.min(Math.round(days/365*100),100);
+  var startStr=load('acc-start','2024-04-19');
+  var d=document.getElementById('acc-days');if(d)d.textContent=days;
+  var bar=document.getElementById('acc-bar');if(bar)bar.style.width=pct+'%';
+  var bt=document.getElementById('acc-bar-txt');if(bt)bt.textContent=days+' / 365일 ('+pct+'%)';
+  var r=document.getElementById('acc-rate');if(r)r.innerHTML=rate+'<span class="su">%</span>';
+  var t2=document.getElementById('acc-total');if(t2)t2.innerHTML=total+'<span class="su">명</span>';
+  var c=document.getElementById('acc-comp');if(c)c.innerHTML=comp+'<span class="su">%</span>';
+  var since=document.getElementById('acc-since');if(since)since.textContent=(startStr||'').replace(/-/g,'.')+'부터 현재까지';
+  var teams=['수거 1팀','수거 2팀','수거 3팀','수거 4팀'];
+  var ta=document.getElementById('team-acc');
+  if(ta){var h='';teams.forEach(function(tn,i){h+='<div class="row"><div class="ri"><div class="rn">'+tn+'</div></div><span style="font-size:15px;font-weight:700;color:'+(i<2?'var(--org)':'var(--grn)')+'">'+Math.max(0,days-i*30)+'일</span></div>';});ta.innerHTML=h;}
+}
+
+// ── 무사고 설정 ──
+function loadAccSettingUI(){
+  var startStr=load('acc-start','2024-04-19')||'';
+  var offset=parseInt(load('acc-offset',0))||0;
+  var si=document.getElementById('acc-start-inp');if(si)si.value=startStr;
+  var oi=document.getElementById('acc-offset-inp');if(oi)oi.value=offset||'';
+  var prev=document.getElementById('acc-preview');if(prev)prev.textContent=calcAccDays();
+}
+function saveAccSetting(){
+  var startVal=document.getElementById('acc-start-inp').value;
+  var offsetVal=parseInt(document.getElementById('acc-offset-inp').value)||0;
+  if(!startVal){toast('⚠️ 기준일을 선택하세요');return;}
+  save('acc-start',startVal);save('acc-offset',offsetVal);
+  loadAccSettingUI();updateAccStats();
+  toast('💾 무사고 카운터 저장! 매일 자동 증가합니다');
+}
+function resetAccToday(){
+  if(!confirm('오늘부터 무사고 카운터를 0으로 리셋하시겠습니까?'))return;
+  save('acc-start',getToday());save('acc-offset',0);
+  loadAccSettingUI();updateAccStats();
+  toast('🔄 오늘부터 무사고 카운터 재시작!');
+}
+
+// ── 공지사항 ──
+function loadGlobalNotice(){
+  var notices=load('notices',[]);var gn=document.getElementById('global-notice');
+  if(!gn)return;
+  if(notices&&notices.length>0){gn.style.display='block';gn.textContent='📢 '+notices[0].text;}
+  else gn.style.display='none';
+}
+function saveNotice(){
+  var txt=document.getElementById('notice-inp').value.trim();
+  if(!txt){toast('⚠️ 공지 내용을 입력하세요');return;}
+  var notices=load('notices',[]);
+  notices.unshift({id:Date.now(),date:getToday(),time:getNow(),text:txt});
+  if(notices.length>30)notices=notices.slice(0,30);
+  save('notices',notices);loadGlobalNotice();renderNoticeAdmin();renderNoticeList();
+  toast('📢 공지가 저장됐습니다');
+}
+function clearAllNotices(){
+  if(!confirm('모든 공지를 삭제하시겠습니까?'))return;
+  save('notices',[]);loadGlobalNotice();renderNoticeAdmin();renderNoticeList();toast('공지가 삭제됐습니다');
+}
+function deleteNotice(id){
+  save('notices',load('notices',[]).filter(function(n){return n.id!==id;}));
+  loadGlobalNotice();renderNoticeAdmin();renderNoticeList();toast('삭제됐습니다');
+}
+function renderNoticeList(){
+  var notices=load('notices',[]);var el=document.getElementById('notice-list-wrap');if(!el)return;
+  if(!notices||!notices.length){el.innerHTML='<div class="empty-msg">📭 등록된 공지사항이 없습니다</div>';return;}
+  el.innerHTML=notices.map(function(n){return '<div class="notice-item"><div class="notice-date">📅 '+n.date+' '+n.time+'</div><div class="notice-body">'+n.text+'</div></div>';}).join('');
+}
+function renderNoticeAdmin(){
+  var notices=load('notices',[]);var el=document.getElementById('notice-admin-list');if(!el)return;
+  var inp=document.getElementById('notice-inp');if(inp&&notices.length>0)inp.value=notices[0].text;
+  if(!notices||!notices.length){el.innerHTML='<div class="empty-msg">등록된 공지가 없습니다</div>';return;}
+  el.innerHTML=notices.map(function(n){return '<div class="notice-item"><div class="notice-date">'+n.date+' '+n.time+'</div><div class="notice-body">'+n.text+'</div><button onclick="deleteNotice('+n.id+')" class="sbtn sbtn-red" style="margin-top:7px">삭제</button></div>';}).join('');
+}
+
+// ── 관리자 대시보드 ──
+function renderAdminStats(){
+  var st=load('staff',[]);var inC=0,outC=0,lateC=0,warnC=0;
+  for(var i=0;i<st.length;i++){var s=st[i];if(s.status==='in'||s.status==='late'){inC++;if(s.status==='late')lateC++;if(!s.safe)warnC++;}else outC++;}
+  var total=st.length;var pct=total>0?Math.round(inC/total*100):0;
+  document.getElementById('adm-stats').innerHTML=
+    '<div class="sbox" style="border-left:3px solid var(--grn)"><div class="sl">✅ 출근</div><div class="sv" style="color:var(--grn)">'+inC+'<span class="su">/'+total+'</span></div><div style="font-size:11px;color:var(--grn)">출근율 '+pct+'%</div></div>'+
+    '<div class="sbox" style="border-left:3px solid var(--text2)"><div class="sl">❌ 미출근</div><div class="sv" style="color:var(--text2)">'+outC+'<span class="su"> 명</span></div></div>'+
+    '<div class="sbox" style="border-left:3px solid var(--red)"><div class="sl">⚠️ 지각</div><div class="sv" style="color:var(--red)">'+lateC+'<span class="su"> 명</span></div></div>'+
+    '<div class="sbox" style="border-left:3px solid var(--amb)"><div class="sl">🔔 점검미완</div><div class="sv" style="color:var(--amb)">'+warnC+'<span class="su"> 명</span></div></div>';
+  var issues=[];if(outC>0)issues.push('미출근 <b>'+outC+'명</b>');if(warnC>0)issues.push('점검미완 <b>'+warnC+'명</b>');
+  var alertEl=document.getElementById('adm-alert');
+  alertEl.innerHTML=issues.length
+    ?'<div class="al-box"><span style="font-size:13px;color:var(--red);font-weight:700">⚠️ '+issues.join(' · ')+' — 즉시 확인 필요</span></div>'
+    :'<div class="ok-box"><span style="font-size:13px;color:var(--grn);font-weight:700">✅ 이상 없음</span></div>';
+  var cnt=document.getElementById('roster-cnt');if(cnt)cnt.textContent='전체 '+total+'명';
+}
+function setFilt(f,btn){curFilt=f;document.querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');filterRoster();}
+function filterRoster(){
+  var q=document.getElementById('adm-search')?document.getElementById('adm-search').value.trim():'';
+  var list=load('staff',[]);
+  if(q)list=list.filter(function(p){return p.name.indexOf(q)>-1;});
+  if(curFilt==='warn')list=list.filter(function(p){return(p.status==='in'||p.status==='late')&&!p.safe;});
+  else if(curFilt!=='all')list=list.filter(function(p){return p.status===curFilt;});
+  var el=document.getElementById('adm-roster');if(!el)return;
+  if(!list.length){el.innerHTML='<div style="padding:14px;text-align:center;font-size:13px;color:var(--text2)">해당 직원 없음</div>';return;}
+  var html='';
+  list.forEach(function(p){
+    var bk=(p.status==='in'||p.status==='late')&&!p.safe?'warn':p.status;
+    var bm={in:'b-in',out:'b-out',late:'b-late',warn:'b-warn'};
+    var bt={in:'출근',out:'미출근',late:'지각',warn:'점검미완'};
+    var gTag=p.gps?'<span class="tag" style="background:var(--grn-lt);color:var(--grn)">GPS✓</span>':'<span class="tag" style="background:var(--red-lt);color:var(--red)">GPS✗</span>';
+    // 출근시간·GPS주소 상세
+    var detail=p.role+' · '+p.team;
+    if(p.time)detail+=' · <b style="color:var(--grn)">'+p.time+'</b>';
+    else detail+=' · 미출근';
+    var gpsDetail=p.gpsAddr?'<div style="font-size:10px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">📍 '+p.gpsAddr+'</div>':'';
+    var actionBtn='';
+    if(p.status==='out'){
+      actionBtn='<button onclick="forceCheckin('+p.id+')" class="sbtn sbtn-grn">출근</button>';
+    }else if(!p.safe){
+      actionBtn='<button onclick="forceSafe('+p.id+')" class="sbtn sbtn-org">점검완료</button>';
+    }else{
+      actionBtn='<span class="badge '+bm[bk]+'">'+bt[bk]+'</span>';
+    }
+    html+='<div class="row"><div class="av" style="'+(p.status==='out'?'background:var(--gray2);color:var(--text2)':'')+'">'+p.name[0]+'</div><div class="ri"><div class="rn">'+p.name+gTag+'</div><div class="rd">'+detail+'</div>'+gpsDetail+'</div>'+actionBtn+'</div>';
+  });
+  el.innerHTML=html;
+}
+function forceCheckin(id){
+  var t=getNow();var st=load('staff',[]);
+  for(var i=0;i<st.length;i++)if(st[i].id===id){st[i].status='in';st[i].time=t+'(관)';st[i].gps=false;st[i].gpsAddr='관리자 처리';break;}
+  save('staff',st);filterRoster();renderAdminStats();toast('✅ 출근 처리 완료');
+}
+function forceSafe(id){
+  var st=load('staff',[]);
+  for(var i=0;i<st.length;i++)if(st[i].id===id){st[i].safe=true;break;}
+  save('staff',st);filterRoster();renderAdminStats();toast('📋 안전점검 완료 처리');
+}
+
+// ── 직원 관리 ──
+function addStaff(){
+  var name=document.getElementById('new-name').value.trim();
+  var role=document.getElementById('new-role').value;
+  var team=document.getElementById('new-team').value;
+  var phone=document.getElementById('new-phone').value.replace(/\D/g,'');
+  if(!name){showErr('staff-err','이름을 입력하세요');return;}
+  if(phone.length<10){showErr('staff-err','올바른 번호를 입력하세요');return;}
+  var staff=load('staff',[]);
+  for(var i=0;i<staff.length;i++)if(staff[i].phone===phone){showErr('staff-err','이미 등록된 번호입니다');return;}
+  staff.push({id:Date.now(),name:name,role:role,team:team,phone:phone,status:'out',time:'',gps:false,gpsAddr:'',safe:false,checkout:''});
+  save('staff',staff);
+  document.getElementById('new-name').value='';document.getElementById('new-phone').value='';
+  renderStaffList();toast('✅ '+name+' '+role+'님 등록 완료!');
+}
+function deleteStaff(id){
+  var staff=load('staff',[]);var t=null;for(var i=0;i<staff.length;i++)if(staff[i].id===id){t=staff[i];break;}
+  if(!confirm((t?t.name+'님을 ':'')+'삭제하시겠습니까?'))return;
+  save('staff',staff.filter(function(s){return s.id!==id;}));renderStaffList();toast('삭제됐습니다');
+}
+function renderStaffList(){
+  var staff=load('staff',[]);var el=document.getElementById('staff-list');
+  var cnt=document.getElementById('staff-count');if(cnt)cnt.textContent=staff.length;
+  if(!staff.length){if(el)el.innerHTML='<div style="padding:14px;text-align:center;font-size:13px;color:var(--text2)">등록된 직원이 없습니다</div>';return;}
+  if(el)el.innerHTML=staff.map(function(s){
+    return '<div class="row"><div class="av">'+s.name[0]+'</div><div class="ri"><div class="rn">'+s.name+' <span class="badge b-org">'+s.role+'</span></div><div class="rd">'+s.team+' · '+s.phone+'</div></div><button onclick="deleteStaff('+s.id+')" class="sbtn sbtn-red">삭제</button></div>';
+  }).join('');
+}
+
+// ── 체크리스트 편집 ──
+function renderCkEditList(){editCklist=JSON.parse(JSON.stringify(load('cklist',[])));drawCkEditList();}
+function drawCkEditList(){
+  var el=document.getElementById('ck-edit-list');var cnt=document.getElementById('ck-count');if(cnt)cnt.textContent=editCklist.length;
+  if(!editCklist.length){if(el)el.innerHTML='<div style="text-align:center;padding:20px;font-size:13px;color:var(--text2)">항목이 없습니다</div>';return;}
+  var groups={};CATS.forEach(function(c){groups[c]=[];});
+  editCklist.forEach(function(it){if(!groups[it.cat])groups[it.cat]=[];groups[it.cat].push(it);});
+  var html='';
+  CATS.forEach(function(cat){
+    if(!groups[cat]||!groups[cat].length)return;
+    html+='<div style="font-size:11px;font-weight:700;color:var(--text2);padding:8px 0 4px">'+(CI[cat]||'📌')+' '+cat+'</div>';
+    groups[cat].forEach(function(it){
+      html+='<div class="ck-edit-item"><div class="ck-edit-info"><div class="ck-edit-txt-d">'+it.txt+'</div><div class="ck-edit-cat">'+it.cat+'</div></div><div style="display:flex;gap:5px"><button class="sbtn sbtn-org" onclick="openCkEdit('+it.id+')">수정</button><button class="sbtn sbtn-red" onclick="delCkItem('+it.id+')">삭제</button></div></div>'
+        +'<div class="ck-inline-edit" id="cie-'+it.id+'"><input class="ck-ie-inp" id="cie-t-'+it.id+'" value="'+it.txt.replace(/"/g,'&quot;')+'"><div class="ck-ie-row"><select class="ck-ie-sel" id="cie-c-'+it.id+'">'+CATS.map(function(ca){return'<option'+(ca===it.cat?' selected':'')+'>'+ca+'</option>';}).join('')+'</select><button class="sbtn sbtn-grn" onclick="saveCkEdit('+it.id+')">확인</button><button class="sbtn" onclick="closeCkEdit('+it.id+')">취소</button></div></div>';
+    });
+  });
+  if(el)el.innerHTML=html;
+}
+function openCkEdit(id){editCklist.forEach(function(it){var f=document.getElementById('cie-'+it.id);if(f)f.style.display='none';});var f=document.getElementById('cie-'+id);if(f){f.style.display='block';var i=document.getElementById('cie-t-'+id);if(i){i.focus();i.select();}}}
+function closeCkEdit(id){var f=document.getElementById('cie-'+id);if(f)f.style.display='none';}
+function saveCkEdit(id){
+  var inp=document.getElementById('cie-t-'+id);var sel=document.getElementById('cie-c-'+id);if(!inp||!sel)return;
+  var txt=inp.value.trim();if(!txt){inp.style.borderColor='var(--red)';inp.focus();return;}
+  for(var i=0;i<editCklist.length;i++)if(editCklist[i].id===id){editCklist[i].txt=txt;editCklist[i].cat=sel.value;break;}
+  drawCkEditList();toast('수정됐습니다 · 저장을 눌러주세요');
+}
+function delCkItem(id){
+  if(editCklist.length<=1){toast('⚠️ 최소 1개 항목은 있어야 합니다');return;}
+  if(!confirm('삭제하시겠습니까?'))return;
+  editCklist=editCklist.filter(function(it){return it.id!==id;});drawCkEditList();toast('삭제 · 저장을 눌러주세요');
+}
+function addCkItem(){
+  var inp=document.getElementById('new-ck-txt');var sel=document.getElementById('new-ck-cat');
+  var txt=inp.value.trim();if(!txt){showErr('ck-err','항목 내용을 입력하세요');inp.focus();return;}
+  editCklist.push({id:Date.now(),txt:txt,cat:sel.value});inp.value='';inp.focus();
+  drawCkEditList();toast('✅ 추가됐습니다 · 저장을 눌러주세요');
+}
+function saveCklist(){
+  if(!editCklist.length){toast('항목이 없습니다');return;}
+  save('cklist',editCklist);renderChecklist();drawCkEditList();toast('💾 저장 완료! 직원 탭에 즉시 반영됐습니다');
+}
+function resetCklist(){if(!confirm('변경을 취소하시겠습니까?'))return;renderCkEditList();toast('↩️ 되돌렸습니다');}
+
+// ── 관리자 계정 ──
+function addAdmin(){
+  var admins=load('admins',[]);
+  if(admins.length>=2){showErr('admin-err','최대 2명까지 등록 가능합니다');return;}
+  var name=document.getElementById('adm-new-name').value.trim();
+  var phone=document.getElementById('adm-new-phone').value.replace(/\D/g,'');
+  var pw=document.getElementById('adm-new-pw').value;
+  if(!name){showErr('admin-err','이름을 입력하세요');return;}
+  if(phone.length<10){showErr('admin-err','올바른 번호를 입력하세요');return;}
+  if(pw.length<4){showErr('admin-err','비밀번호는 4자리 이상');return;}
+  for(var i=0;i<admins.length;i++)if(admins[i].phone===phone){showErr('admin-err','이미 등록된 번호입니다');return;}
+  admins.push({name:name,phone:phone,pw:pw});save('admins',admins);
+  document.getElementById('adm-new-name').value='';document.getElementById('adm-new-phone').value='';document.getElementById('adm-new-pw').value='';
+  renderAdminList();toast('✅ '+name+' 관리자 추가!');
+}
+function deleteAdmin(phone){
+  var admins=load('admins',[]);if(admins.length<=1){toast('최소 1명은 필요합니다');return;}
+  if(CU&&phone===CU.phone){toast('본인 계정은 삭제 불가');return;}
+  if(!confirm('이 관리자를 삭제하시겠습니까?'))return;
+  save('admins',admins.filter(function(a){return a.phone!==phone;}));renderAdminList();toast('삭제됐습니다');
+}
+function renderAdminList(){
+  var admins=load('admins',[]);var el=document.getElementById('admin-list');if(!el)return;
+  el.innerHTML=admins.map(function(a){
+    var isMe=CU&&a.phone===CU.phone;
+    return '<div class="row"><div class="av" style="background:var(--blue-lt);color:var(--blue)">관</div><div class="ri"><div class="rn">'+a.name+' <span class="adm-chip">관리자</span>'+(isMe?' <span style="font-size:10px;color:var(--org-dk)">(나)</span>':'')+'</div><div class="rd">'+a.phone+'</div></div>'+(admins.length>1&&!isMe?'<button onclick="deleteAdmin(\''+a.phone+'\')" class="sbtn sbtn-red">삭제</button>':'<span style="font-size:11px;color:var(--text3)">'+(isMe?'본인':'필수')+'</span>')+'</div>';
+  }).join('');
+  document.getElementById('admin-add-wrap').style.display=admins.length>=2?'none':'block';
+}
+function changePw(){
+  var old=document.getElementById('pw-old').value;
+  var nw=document.getElementById('pw-new').value;
+  var nw2=document.getElementById('pw-new2').value;
+  var admins=load('admins',[]);var idx=-1;
+  for(var i=0;i<admins.length;i++)if(CU&&admins[i].phone===CU.phone){idx=i;break;}
+  if(idx===-1){showErr('pw-err','계정을 찾을 수 없습니다');return;}
+  if(admins[idx].pw!==old){showErr('pw-err','현재 비밀번호가 올바르지 않습니다');return;}
+  if(nw.length<4){showErr('pw-err','새 비밀번호는 4자리 이상');return;}
+  if(nw!==nw2){showErr('pw-err','비밀번호가 일치하지 않습니다');return;}
+  admins[idx].pw=nw;save('admins',admins);
+  ['pw-old','pw-new','pw-new2'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  toast('✅ 비밀번호가 변경됐습니다');
+}
+
+// ── 데이터 초기화 ──
+function resetAllAttendance(){
+  if(!confirm('오늘 전체 직원 출근·점검 상태를 초기화하시겠습니까?\n(출근 이력은 유지됩니다)'))return;
+  var st=load('staff',[]);st.forEach(function(s){s.status='out';s.time='';s.gps=false;s.gpsAddr='';s.safe=false;s.checkout='';});
+  save('staff',st);renderAdminStats();filterRoster();toast('🔄 출근 상태가 초기화됐습니다');
+}
+function clearAttendanceHistory(){
+  if(!confirm('출근기록 전체를 영구 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'))return;
+  if(!confirm('정말 삭제하시겠습니까?'))return;
+  save('attendance',[]);renderRecords();toast('🗑️ 출근기록이 삭제됐습니다');
+}
+
+// ══════════════════════════════════════
+// 출근기록 조회 & 엑셀/CSV 다운로드
+// ══════════════════════════════════════
+
+// 필터된 기록 반환
+function getFilteredRecs(){
+  var recs=load('attendance',[]);
+  var q=document.getElementById('rec-search')?document.getElementById('rec-search').value.trim():'';
+  var dt=document.getElementById('rec-date')?document.getElementById('rec-date').value:'';
+  if(q)recs=recs.filter(function(r){return r.name&&r.name.indexOf(q)>-1;});
+  if(dt)recs=recs.filter(function(r){return r.date===dt;});
+  return recs.sort(function(a,b){return b.id-a.id;});
+}
+
+// 출근기록 요약 렌더
+function renderRecordsSummary(recs){
+  var el=document.getElementById('rec-summary');if(!el)return;
+  var total=recs.length;
+  var gpsOk=recs.filter(function(r){return r.gps;}).length;
+  var safeOk=recs.filter(function(r){return r.safe;}).length;
+  el.innerHTML=
+    '<div class="rec-sum"><div class="rec-sum-n">'+total+'</div><div class="rec-sum-l">전체 기록</div></div>'+
+    '<div class="rec-sum"><div class="rec-sum-n" style="color:var(--grn)">'+gpsOk+'</div><div class="rec-sum-l">GPS 인증</div></div>'+
+    '<div class="rec-sum"><div class="rec-sum-n" style="color:var(--blue)">'+safeOk+'</div><div class="rec-sum-l">점검 완료</div></div>';
+  var badge=document.getElementById('rec-cnt-badge');if(badge)badge.textContent=total+'건';
+}
+
+// 출근기록 테이블 렌더
+function renderRecords(){
+  var recs=getFilteredRecs();
+  renderRecordsSummary(recs);
+  var wrap=document.getElementById('rec-table-wrap');if(!wrap)return;
+  if(!recs.length){wrap.innerHTML='<p class="empty-msg">출근기록이 없습니다</p>';return;}
+  var rows=recs.map(function(r){
+    var gpsCell=r.gps
+      ?'<div style="color:var(--grn);font-weight:700;font-size:10px">✅ GPS인증</div>'
+       +'<div style="font-size:10px;color:var(--text2);max-width:140px;overflow:hidden;text-overflow:ellipsis" title="'+(r.gpsAddr||'')+'">'+(r.gpsAddr||'-')+'</div>'
+      :'<span style="color:var(--text3);font-size:10px">✗ 미인증</span>';
+    var safeCell=r.safe
+      ?'<span style="background:var(--grn-lt);color:var(--grn);padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px">완료</span>'
+      :'<span style="background:var(--red-lt);color:var(--red);padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px">미완</span>';
+    var statusColor=r.status==='퇴근완료'?'var(--text2)':r.status==='출근'?'var(--grn)':'var(--text2)';
+    return '<tr>'
+      +'<td>'+r.date+'</td>'
+      +'<td style="font-weight:700;color:var(--grn)">'+r.checkinTime+'</td>'
+      +'<td style="font-weight:600">'+r.name+'</td>'
+      +'<td>'+r.role+'</td>'
+      +'<td>'+r.team+'</td>'
+      +'<td>'+gpsCell+'</td>'
+      +'<td>'+safeCell+'</td>'
+      +'<td>'+(r.checkoutTime||'<span style="color:var(--text3)">-</span>')+'</td>'
+      +'<td style="color:'+statusColor+'">'+r.status+'</td>'
+      +'</tr>';
+  }).join('');
+  wrap.innerHTML='<table class="rec-table"><thead><tr>'
+    +'<th>날짜</th><th>출근시간</th><th>성명</th><th>직책</th><th>팀</th>'
+    +'<th>GPS 위치</th><th>안전점검</th><th>퇴근시간</th><th>상태</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+// ── 엑셀(.xlsx) 다운로드 ──
+function exportXLSX(scope){
+  if(typeof XLSX==='undefined'){toast('⚠️ 엑셀 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');return;}
+  var recs=load('attendance',[]);
+  if(!recs||!recs.length){toast('⚠️ 저장된 출근기록이 없습니다');return;}
+  var today=getToday();
+  if(scope==='today')recs=recs.filter(function(r){return r.date===today;});
+  if(!recs.length){toast('오늘 출근기록이 없습니다');return;}
+  recs=recs.sort(function(a,b){return a.id-b.id;});
+
+  // 워크시트 데이터
+  var headers=['날짜','출근시간','퇴근시간','성명','직책','팀','전화번호','GPS인증','GPS위치','안전점검완료','출근상태','비고'];
+  var data=[headers];
+  recs.forEach(function(r){
+    data.push([
+      r.date||'',
+      r.checkinTime||'',
+      r.checkoutTime||'',
+      r.name||'',
+      r.role||'',
+      r.team||'',
+      r.phone||'',
+      r.gps?'O':'X',
+      r.gpsAddr||'',
+      r.safe?'완료':'미완',
+      r.status||'',
+      r.note||''
+    ]);
+  });
+
+  var ws=XLSX.utils.aoa_to_sheet(data);
+  // 컬럼 너비 설정
+  ws['!cols']=[
+    {wch:12},{wch:10},{wch:10},{wch:8},{wch:8},{wch:10},{wch:14},
+    {wch:8},{wch:30},{wch:12},{wch:10},{wch:12}
+  ];
+  // 헤더 스타일 (배경색)
+  var range=XLSX.utils.decode_range(ws['!ref']);
+  for(var C=range.s.c;C<=range.e.c;C++){
+    var cellAddr=XLSX.utils.encode_cell({r:0,c:C});
+    if(!ws[cellAddr])continue;
+    ws[cellAddr].s={fill:{fgColor:{rgb:'E8520A'}},font:{color:{rgb:'FFFFFF'},bold:true},alignment:{horizontal:'center'}};
+  }
+
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'출근기록');
+
+  // 직원 목록 시트 추가
+  var staff=load('staff',[]);
+  if(staff.length>0){
+    var staffHeaders=['이름','직책','팀','전화번호','오늘상태','출근시간','GPS인증','안전점검'];
+    var staffData=[staffHeaders];
+    staff.forEach(function(s){
+      staffData.push([s.name,s.role,s.team,s.phone,s.status==='in'?'출근':s.status==='late'?'지각':'미출근',s.time||'',s.gps?'O':'X',s.safe?'완료':'미완']);
+    });
+    var wsStaff=XLSX.utils.aoa_to_sheet(staffData);
+    wsStaff['!cols']=[{wch:8},{wch:8},{wch:10},{wch:14},{wch:8},{wch:10},{wch:8},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,wsStaff,'직원현황');
+  }
+
+  var filename='나눔환경_출근기록_'+(scope==='today'?today:'전체')+'_'+today.replace(/-/g,'')+'.xlsx';
+  XLSX.writeFile(wb,filename);
+  toast('📊 엑셀 다운로드 완료! ('+recs.length+'건)');
+}
+
+// ── CSV 다운로드 ──
+function exportCSV(){
+  var recs=load('attendance',[]);
+  if(!recs||!recs.length){toast('⚠️ 저장된 출근기록이 없습니다');return;}
+  var BOM='\uFEFF';
+  var hdr='날짜,출근시간,퇴근시간,성명,직책,팀,전화번호,GPS인증,GPS위치,안전점검,출근상태\n';
+  var rows=recs.sort(function(a,b){return a.id-b.id;}).map(function(r){
+    return[r.date||'',r.checkinTime||'',r.checkoutTime||'',r.name||'',r.role||'',r.team||'',r.phone||'',r.gps?'O':'X','"'+(r.gpsAddr||'').replace(/"/g,'""')+'"',r.safe?'완료':'미완',r.status||''].join(',');
+  }).join('\n');
+  var blob=new Blob([BOM+hdr+rows],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');
+  a.href=url;a.download='나눔환경_출근기록_'+getToday().replace(/-/g,'')+'.csv';
+  a.style.display='none';document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},5000);
+  toast('📄 CSV 다운로드 완료!');
+}
+
+// ── 로그아웃 ──
+function logout(){
+  if(!confirm('로그아웃 하시겠습니까?'))return;
+  CU=null;ckDone=0;signed=false;curFilt='all';curGpsAddr='';
+  if(_clockInterval){clearInterval(_clockInterval);_clockInterval=null;}
+  document.getElementById('app').style.display='none';
+  document.getElementById('staff-tab-bar').style.display='none';
+  document.getElementById('adm-tab-bar').classList.remove('show');
+  ['inp-name','inp-phone'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('login-err').textContent='';
+  var btnCI=document.getElementById('btn-ci');if(btnCI){btnCI.style.display='block';btnCI.disabled=false;btnCI.style.opacity='1';btnCI.textContent='📍 출근 체크하기';}
+  var btnCO=document.getElementById('btn-co');if(btnCO){btnCO.style.display='none';btnCO.disabled=false;btnCO.textContent='🏠 퇴근 체크';}
+  document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('active');});
+  document.getElementById('scr-home').classList.add('active');
+  document.getElementById('ov-login').classList.remove('off');
+}
+
+// ── 시작 ──
+updateClock();
+// 시작 시 클록 interval (로그인 전용, 부트 후에는 재설정)
+var _initClockInterval=setInterval(updateClock,30000);
+
+// 크롬 아닌 브라우저에서 열린 경우 안내 (인앱 아닌 경우만)
+(function(){
+  if(IS_STANDALONE||IS_INAPP)return;
+  var isChrome=/Chrome\//.test(UA)&&!/Chromium|Edge|OPR|SamsungBrowser/.test(UA);
+  if(!isChrome&&!load('chrome-guide-shown',false)){
+    save('chrome-guide-shown',true);
+    setTimeout(function(){
+      var msg=IS_IOS
+        ?'💡 홈화면 설치 안내\n\nSafari 하단 공유(□↑) → "홈 화면에 추가"\n또는 Chrome 앱에서 열면 앱으로 설치 가능합니다!'
+        :'💡 크롬(Chrome)으로 열면\n홈화면에 앱으로 설치할 수 있습니다!\n\nChrome 브라우저에서 주소창 ⋮ → 앱 설치';
+      if(confirm(msg+'\n\n[확인] 닫기')){}
+    },1500);
+  }
+})();
+</script>
+
+</body>
+</html>
